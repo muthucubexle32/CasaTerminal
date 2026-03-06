@@ -7,7 +7,7 @@ import {
   Shield, Truck
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import Logo from "@/assets/logo.png";
+import logo from "@/assets/logo.png";
 
 interface FooterSection {
   title: string;
@@ -178,9 +178,9 @@ const Footer = () => {
                 transition={{ duration: 0.5 }}
                 className="w-12 h-12  rounded-lg flex items-center justify-center overflow-hidden"
               >
-                {Logo ? (
+                {logo ? (
                   <img
-                    src={Logo}
+                    src={logo}
                     alt="Casa Terminal Logo"
                     className="w-full h-full object-cover"
                     onError={(e) => {
@@ -328,9 +328,9 @@ const Footer = () => {
                 transition={{ duration: 0.5 }}
                 className="w-12 h-12  rounded-lg flex items-center justify-center overflow-hidden"
               >
-                {Logo ? (
+                {logo ? (
                   <img
-                    src={Logo}
+                    src={logo}
                     alt="Casa Terminal Logo"
                     className="w-full h-full object-cover"
                     onError={(e) => {

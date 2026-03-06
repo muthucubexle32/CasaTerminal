@@ -2,14 +2,10 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ChevronDown, Search, User, LogIn } from 'lucide-react';
-import Logo from "@/assets/logo.png";
+import logo from "@/assets/logo.png";
+
 // Try to import logo, but provide fallback if it doesn't exist
-let logo;
-try {
-  logo = new URL('../src/assets/Logo.png', import.meta.url).href;
-} catch (e) {
-  logo = null;
-}
+
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -153,11 +149,11 @@ const Navbar = () => {
               <motion.div
                 whileHover={{ rotate: 360 }}
                 transition={{ duration: 0.5 }}
-                className="w-12 h-12  rounded-lg flex items-center justify-center overflow-hidden"
+                className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden "
               >
                 {logo ? (
                   <img
-                    src={Logo}
+                    src={logo}
                     alt="Casa Terminal Logo"
                     className="w-full h-full object-cover"
                     onError={(e) => {
@@ -176,7 +172,7 @@ const Navbar = () => {
                   <span className="text-[#502d13] font-bold text-xl">CT</span>
                 )}
               </motion.div>
-              <span className="text-2xl font-bold text-[#e9cfa4] group-hover:text-white transition-colors">
+              <span className="text-2xl font-bold text-[#e9ddc8] group-hover:text-white transition-colors">
                 CASA TERMINAL
               </span>
             </Link>
@@ -186,7 +182,7 @@ const Navbar = () => {
               {navLinks.map((link) => (
                 <div
                   key={link.label}
-                  className="relative "
+                  className="relative"
                   onMouseEnter={() => {
                     if (windowWidth >= 768) {
                       link.megaMenu && setActiveMegaMenu(link.label);
@@ -201,7 +197,7 @@ const Navbar = () => {
                   {link.megaMenu ? (
                     <button
                       onClick={() => link.label === 'Services' && scrollToSection('services')}
-                      className="text-[#e9ddc8]/90 hover:text-white font-medium transition-colors relative group flex items-center gap-1 "
+                      className="text-[#e9ddc8]/90 hover:text-white font-medium transition-colors relative group flex items-center gap-1"
                     >
                       {link.label}
                       <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${
@@ -232,9 +228,9 @@ const Navbar = () => {
                           transition={{ duration: 0.2 }}
                           onMouseEnter={() => setActiveMegaMenu(link.label)}
                           onMouseLeave={() => setActiveMegaMenu(null)}
-                          className="absolute top-full left-1/2 -translate-x-1/2 mt-7 w-[800px] bg-[#502d13] rounded-lg shadow-xl border border-[#e9ddc8]/20 overflow-hidden "
+                          className="absolute top-full left-1/2 -translate-x-1/2 mt-7 w-[800px] bg-[#502d13] rounded-lg shadow-xl border border-[#e9ddc8]/20 overflow-hidden"
                         >
-                          <div className="grid grid-cols-3 gap-6 p-6 ">
+                          <div className="grid grid-cols-3 gap-6 p-6">
                             {link.megaMenu.columns.map((column, idx) => (
                               <div key={idx}>
                                 <h4 className="font-semibold text-[#e9ddc8] mb-3 pb-2 border-b border-[#e9ddc8]/20">
