@@ -7,14 +7,10 @@ import {
   Shield, Truck
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import logo from "@/assets/logo.png";
 
 // Try to import logo with fallback
-let logo;
-try {
-  logo = new URL('/src/assets/logo.png', import.meta.url).href;
-} catch (e) {
-  logo = null;
-}
+
 
 interface FooterSection {
   title: string;
@@ -184,7 +180,7 @@ const Footer = () => {
               <motion.div
                 whileHover={{ rotate: 360 }}
                 transition={{ duration: 0.5 }}
-                className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden bg-[#e9ddc8]"
+                className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden "
               >
                 {logo && !logoError ? (
                   <img
