@@ -3,6 +3,16 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ChevronDown, Search, User, LogIn } from 'lucide-react';
 
+// Try to import logo with fallback
+let logo;
+try {
+  // Try using the @ alias first
+  logo = new URL('/src/assets/logo.png', import.meta.url).href;
+} catch (e) {
+  // Fallback to null if import fails
+  logo = null;
+}
+
 const navLinks = [
   { label: "Home", href: "/" },
   {
@@ -55,6 +65,7 @@ const Navbar = () => {
   const [windowWidth, setWindowWidth] = useState(
     typeof window !== "undefined" ? window.innerWidth : 0,
   );
+  const [logoError, setLogoError] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -145,13 +156,18 @@ const Navbar = () => {
               <motion.div
                 whileHover={{ rotate: 360 }}
                 transition={{ duration: 0.5 }}
-                className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden "
+                className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden bg-[#e9ddc8]"
               >
-               <img
-                src="./src/assets/logo.png"
-                alt="Casa Terminal Logo"
-                className="w-full h-full object-cover"
-              />
+                {logo && !logoError ? (
+                  <img
+                    src={logo}
+                    alt="Casa Terminal Logo"
+                    className="w-full h-full object-cover"
+                    onError={() => setLogoError(true)}
+                  />
+                ) : (
+                  <span className="text-[#502d13] font-bold text-xl">CT</span>
+                )}
               </motion.div>
               <span className="text-2xl font-bold text-[#e9ddc8] group-hover:text-white transition-colors">
                 CASA TERMINAL
