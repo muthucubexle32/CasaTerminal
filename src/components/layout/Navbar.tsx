@@ -66,7 +66,7 @@ const Navbar = () => {
     };
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
-      if (window.innerWidth >= 768) {
+      if (window.innerWidth >= 1024) {
         setIsOpen(false);
         setMobileMenuOpen(null);
       }
@@ -130,6 +130,9 @@ const Navbar = () => {
     }
   };
 
+  // Determine device type based on window width
+  const isDesktop = windowWidth >= 1024;
+
   return (
     <>
       <motion.nav
@@ -140,14 +143,14 @@ const Navbar = () => {
           isScrolled ? 'bg-[#502d13]/95 backdrop-blur-md shadow-lg' : 'bg-[#502d13]'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
-            {/* Logo */}
-            <Link to="/" className="flex items-center space-x-2 group">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-14 sm:h-16 md:h-20">
+            {/* Logo - Responsive sizing */}
+            <Link to="/" className="flex items-center space-x-1 sm:space-x-2 group">
               <motion.div
                 whileHover={{ rotate: 360 }}
                 transition={{ duration: 0.5 }}
-                className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden "
+                className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg flex items-center justify-center overflow-hidden"
               >
                 {!logoError ? (
                   <img
@@ -157,27 +160,27 @@ const Navbar = () => {
                     onError={() => setLogoError(true)}
                   />
                 ) : (
-                  <span className="text-[#502d13] font-bold text-xl">CT</span>
+                  <span className="text-[#502d13] font-bold text-sm sm:text-base md:text-xl">CT</span>
                 )}
               </motion.div>
-              <span className="text-2xl font-bold text-[#e9ddc8] group-hover:text-white transition-colors">
+              <span className="text-lg sm:text-xl md:text-2xl font-bold text-[#e9ddc8] group-hover:text-white transition-colors">
                 CASA TERMINAL
               </span>
             </Link>
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
+            {/* Desktop Navigation - Hidden on mobile/tablet */}
+            <div className="hidden lg:flex items-center space-x-4 xl:space-x-8">
               {navLinks.map((link) => (
                 <div
                   key={link.label}
                   className="relative"
                   onMouseEnter={() => {
-                    if (windowWidth >= 768) {
+                    if (isDesktop) {
                       link.megaMenu && setActiveMegaMenu(link.label);
                     }
                   }}
                   onMouseLeave={() => {
-                    if (windowWidth >= 768) {
+                    if (isDesktop) {
                       setActiveMegaMenu(null);
                     }
                   }}
@@ -185,10 +188,10 @@ const Navbar = () => {
                   {link.megaMenu ? (
                     <button
                       onClick={() => link.label === 'Services' && scrollToSection('services')}
-                      className="text-[#e9ddc8]/90 hover:text-white font-medium transition-colors relative group flex items-center gap-1"
+                      className="text-[#e9ddc8]/90 hover:text-white font-medium transition-colors relative group flex items-center gap-1 text-sm xl:text-base"
                     >
                       {link.label}
-                      <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${
+                      <ChevronDown className={`w-3 h-3 xl:w-4 xl:h-4 transition-transform duration-300 ${
                         activeMegaMenu === link.label ? 'rotate-180' : ''
                       }`} />
                       <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#e9ddc8] transition-all group-hover:w-full"></span>
@@ -197,18 +200,18 @@ const Navbar = () => {
                     <a
                       href={link.href}
                       onClick={(e) => handleNavClick(e, link.href)}
-                      className="text-[#e9ddc8]/90 hover:text-white font-medium transition-colors relative group"
+                      className="text-[#e9ddc8]/90 hover:text-white font-medium transition-colors relative group text-sm xl:text-base"
                     >
                       {link.label}
                       <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#e9ddc8] transition-all group-hover:w-full"></span>
                     </a>
                   )}
 
-                  {/* Mega Menu */}
+                  {/* Mega Menu - Desktop only */}
                   <AnimatePresence>
                     {link.megaMenu &&
                       activeMegaMenu === link.label &&
-                      windowWidth >= 768 && (
+                      isDesktop && (
                         <motion.div
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
@@ -216,20 +219,20 @@ const Navbar = () => {
                           transition={{ duration: 0.2 }}
                           onMouseEnter={() => setActiveMegaMenu(link.label)}
                           onMouseLeave={() => setActiveMegaMenu(null)}
-                          className="absolute top-full left-1/2 -translate-x-1/2 mt-7 w-[800px] bg-[#502d13] rounded-lg shadow-xl border border-[#e9ddc8]/20 overflow-hidden"
+                          className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[700px] xl:w-[800px] bg-[#502d13] rounded-lg shadow-xl border border-[#e9ddc8]/20 overflow-hidden"
                         >
-                          <div className="grid grid-cols-3 gap-6 p-6">
+                          <div className="grid grid-cols-3 gap-4 xl:gap-6 p-4 xl:p-6">
                             {link.megaMenu.columns.map((column, idx) => (
                               <div key={idx}>
-                                <h4 className="font-semibold text-[#e9ddc8] mb-3 pb-2 border-b border-[#e9ddc8]/20">
+                                <h4 className="font-semibold text-[#e9ddc8] mb-2 xl:mb-3 pb-1 xl:pb-2 border-b border-[#e9ddc8]/20 text-sm xl:text-base">
                                   {column.title}
                                 </h4>
-                                <ul className="space-y-2">
+                                <ul className="space-y-1 xl:space-y-2">
                                   {column.links.map((item) => (
                                     <li key={item}>
                                       <a
                                         href="#"
-                                        className="text-[#e9ddc8]/70 hover:text-white text-sm transition-colors block hover:translate-x-1 transform duration-200"
+                                        className="text-[#e9ddc8]/70 hover:text-white text-xs xl:text-sm transition-colors block hover:translate-x-1 transform duration-200"
                                         onClick={() => setActiveMegaMenu(null)}
                                       >
                                         {item}
@@ -247,48 +250,57 @@ const Navbar = () => {
               ))}
             </div>
 
-            {/* Action Icons */}
-            <div className="flex items-center space-x-2">
+            {/* Action Icons - Responsive */}
+            <div className="flex items-center space-x-1 sm:space-x-2">
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setShowSearch(true)}
-                className="p-2 rounded-lg text-[#e9ddc8] hover:bg-[#e9ddc8]/10 transition-colors"
+                className="p-1.5 sm:p-2 rounded-lg text-[#e9ddc8] hover:bg-[#e9ddc8]/10 transition-colors"
                 aria-label="Search"
               >
-                <Search className="w-5 h-5" />
+                <Search className="w-4 h-4 sm:w-5 sm:h-5" />
               </motion.button>
 
+              {/* User icon - hidden on very small screens */}
               <motion.a
                 href="#"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                className="hidden sm:block p-2 rounded-lg text-[#e9ddc8] hover:bg-[#e9ddc8]/10 transition-colors"
+                className="hidden min-[400px]:block p-1.5 sm:p-2 rounded-lg text-[#e9ddc8] hover:bg-[#e9ddc8]/10 transition-colors"
                 aria-label="User account"
               >
-                <User className="w-5 h-5" />
+                <User className="w-4 h-4 sm:w-5 sm:h-5" />
               </motion.a>
 
+              {/* Member button - responsive text */}
               <Link
                 to="/member"
-                className="bg-[#e9ddc8] text-[#502d13] px-4 py-2 rounded-lg font-semibold hover:bg-white transition-colors flex items-center space-x-2"
+                className="bg-[#e9ddc8] text-[#502d13] px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-lg font-semibold hover:bg-white transition-colors flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm md:text-base"
               >
-                <LogIn className="w-5 h-5" />
-                <span>Become a Member</span>
+                <LogIn className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+            
+                <span className="hidden min-[480px]:inline sm:hidden">Join as Member</span>
+                <span className="hidden sm:inline">Become a Member</span>
               </Link>
 
-              {/* Mobile Menu Button */}
+              {/* Mobile Menu Button - visible on tablet and below */}
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="md:hidden p-2 rounded-lg hover:bg-[#e9ddc8]/10 transition-colors"
+                className="lg:hidden p-1.5 sm:p-2 rounded-lg hover:bg-[#e9ddc8]/10 transition-colors"
+                aria-label={isOpen ? "Close menu" : "Open menu"}
               >
-                {isOpen ? <X className="w-6 h-6 text-[#e9ddc8]" /> : <Menu className="w-6 h-6 text-[#e9ddc8]" />}
+                {isOpen ? (
+                  <X className="w-5 h-5 sm:w-6 sm:h-6 text-[#e9ddc8]" />
+                ) : (
+                  <Menu className="w-5 h-5 sm:w-6 sm:h-6 text-[#e9ddc8]" />
+                )}
               </button>
             </div>
           </div>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile/Tablet Menu - Responsive */}
         <AnimatePresence>
           {isOpen && (
             <motion.div
@@ -296,20 +308,20 @@ const Navbar = () => {
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3 }}
-              className="md:hidden bg-[#502d13] border-t border-[#e9ddc8]/20"
+              className="lg:hidden bg-[#502d13] border-t border-[#e9ddc8]/20 overflow-y-auto max-h-[calc(100vh-3.5rem)] sm:max-h-[calc(100vh-4rem)]"
             >
-              <div className="px-4 py-6 space-y-4">
+              <div className="px-3 sm:px-4 py-4 sm:py-6 space-y-3 sm:space-y-4">
                 {navLinks.map((link) => (
                   <div key={link.label} className="border-b border-[#e9ddc8]/10 last:border-0">
                     {link.megaMenu ? (
                       <>
                         <button
                           onClick={() => toggleMobileMenu(link.label)}
-                          className="w-full flex items-center justify-between py-3 text-[#e9ddc8] font-medium"
+                          className="w-full flex items-center justify-between py-2 sm:py-3 text-[#e9ddc8] font-medium text-sm sm:text-base"
                         >
                           <span>{link.label}</span>
                           <ChevronDown
-                            className={`w-5 h-5 transition-transform duration-300 ${
+                            className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 ${
                               mobileMenuOpen === link.label ? "rotate-180" : ""
                             }`}
                           />
@@ -324,18 +336,18 @@ const Navbar = () => {
                               transition={{ duration: 0.3 }}
                               className="overflow-hidden"
                             >
-                              <div className="pb-4 space-y-4">
+                              <div className="pb-3 sm:pb-4 space-y-3 sm:space-y-4">
                                 {link.megaMenu.columns.map((column, idx) => (
                                   <div key={idx}>
-                                    <h4 className="text-[#e9ddc8]/60 text-sm font-semibold mb-2 px-2">
+                                    <h4 className="text-[#e9ddc8]/60 text-xs sm:text-sm font-semibold mb-1 sm:mb-2 px-2">
                                       {column.title}
                                     </h4>
-                                    <ul className="space-y-2">
+                                    <ul className="space-y-1 sm:space-y-2">
                                       {column.links.map((item) => (
                                         <li key={item}>
                                           <a
                                             href="#"
-                                            className="block px-2 py-2 text-[#e9ddc8]/80 hover:bg-[#e9ddc8]/10 rounded-lg transition-colors"
+                                            className="block px-2 py-1.5 sm:py-2 text-[#e9ddc8]/80 hover:bg-[#e9ddc8]/10 rounded-lg transition-colors text-xs sm:text-sm"
                                             onClick={() => setIsOpen(false)}
                                           >
                                             {item}
@@ -357,7 +369,7 @@ const Navbar = () => {
                           handleNavClick(e, link.href);
                           setIsOpen(false);
                         }}
-                        className="block py-3 text-[#e9ddc8] font-medium hover:text-white transition-colors"
+                        className="block py-2 sm:py-3 text-[#e9ddc8] font-medium hover:text-white transition-colors text-sm sm:text-base"
                       >
                         {link.label}
                       </a>
@@ -366,18 +378,18 @@ const Navbar = () => {
                 ))}
 
                 {/* Mobile action buttons */}
-                <div className="pt-4 grid grid-cols-2 gap-3">
+                <div className="pt-3 sm:pt-4 grid grid-cols-2 gap-2 sm:gap-3">
                   <Link
                     to="/member"
                     onClick={() => setIsOpen(false)}
-                    className="bg-[#e9ddc8] text-[#502d13] px-6 py-3 rounded-xl font-semibold text-center hover:bg-white transition-colors flex items-center justify-center space-x-2"
+                    className="bg-[#e9ddc8] text-[#502d13] px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-center hover:bg-white transition-colors flex items-center justify-center space-x-1 sm:space-x-2 text-xs sm:text-sm"
                   >
-                    <LogIn className="w-4 h-4" />
-                    <span>Become a Member</span>
+                    <LogIn className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span>Join</span>
                   </Link>
                   <a
                     href="#"
-                    className="bg-transparent border border-[#e9ddc8]/30 text-[#e9ddc8] px-6 py-3 rounded-xl font-semibold text-center hover:bg-[#e9ddc8]/10 transition-colors"
+                    className="bg-transparent border border-[#e9ddc8]/30 text-[#e9ddc8] px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-center hover:bg-[#e9ddc8]/10 transition-colors text-xs sm:text-sm"
                     onClick={() => setIsOpen(false)}
                   >
                     Sign In
@@ -389,14 +401,14 @@ const Navbar = () => {
         </AnimatePresence>
       </motion.nav>
 
-      {/* Search Modal */}
+      {/* Search Modal - Responsive */}
       <AnimatePresence>
         {showSearch && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-xl z-[60] flex items-start justify-center px-4 pt-16 sm:pt-24"
+            className="fixed inset-0 bg-black/50 backdrop-blur-xl z-[60] flex items-start justify-center px-3 sm:px-4 pt-12 sm:pt-16 md:pt-24"
             onClick={() => setShowSearch(false)}
           >
             <motion.div
@@ -404,31 +416,31 @@ const Navbar = () => {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -50, opacity: 0 }}
               transition={{ type: "spring", damping: 25 }}
-              className="w-full max-w-2xl"
+              className="w-full max-w-lg sm:max-w-xl md:max-w-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="bg-[#e9ddc8] rounded-2xl shadow-2xl overflow-hidden">
-                <div className="p-2 flex items-center gap-2">
-                  <Search className="w-5 h-5 text-[#502d13] ml-3 flex-shrink-0" />
+              <div className="bg-[#e9ddc8] rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden">
+                <div className="p-1.5 sm:p-2 flex items-center gap-1 sm:gap-2">
+                  <Search className="w-4 h-4 sm:w-5 sm:h-5 text-[#502d13] ml-2 sm:ml-3 flex-shrink-0" />
                   <input
                     type="text"
-                    placeholder="Search for materials, equipment, contractors..."
-                    className="flex-1 bg-transparent border-none outline-none text-[#502d13] placeholder-[#502d13]/50 py-4 text-sm sm:text-base"
+                    placeholder="Search materials, equipment, contractors..."
+                    className="flex-1 bg-transparent border-none outline-none text-[#502d13] placeholder-[#502d13]/50 py-2 sm:py-3 text-xs sm:text-sm md:text-base"
                     autoFocus
                   />
                   <button
                     onClick={() => setShowSearch(false)}
-                    className="px-3 sm:px-4 py-2 bg-[#502d13] text-[#e9ddc8] rounded-xl hover:bg-[#7b4a26] transition-colors text-sm sm:text-base whitespace-nowrap"
+                    className="px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 bg-[#502d13] text-[#e9ddc8] rounded-lg sm:rounded-xl hover:bg-[#7b4a26] transition-colors text-xs sm:text-sm whitespace-nowrap"
                   >
                     Cancel
                   </button>
                 </div>
 
-                <div className="hidden sm:block px-4 pb-4">
-                  <p className="text-[#502d13]/50 text-xs mb-2">
+                <div className="hidden sm:block px-3 sm:px-4 pb-3 sm:pb-4">
+                  <p className="text-[#502d13]/50 text-xs mb-1 sm:mb-2">
                     Popular searches:
                   </p>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1 sm:gap-2">
                     {[
                       "Cement",
                       "JCB",
@@ -438,7 +450,7 @@ const Navbar = () => {
                     ].map((item) => (
                       <button
                         key={item}
-                        className="px-3 py-1 bg-[#502d13]/10 text-[#502d13] text-xs rounded-full hover:bg-[#502d13]/20 transition-colors"
+                        className="px-2 sm:px-3 py-0.5 sm:py-1 bg-[#502d13]/10 text-[#502d13] text-xs rounded-full hover:bg-[#502d13]/20 transition-colors"
                         onClick={() => {
                           console.log("Search:", item);
                           setShowSearch(false);
@@ -462,7 +474,7 @@ const Navbar = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-40 md:hidden"
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
             onClick={() => setIsOpen(false)}
           />
         )}

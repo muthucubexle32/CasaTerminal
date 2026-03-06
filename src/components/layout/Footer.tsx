@@ -180,7 +180,7 @@ const Footer = () => {
               <motion.div
                 whileHover={{ rotate: 360 }}
                 transition={{ duration: 0.5 }}
-                className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden bg-[#502d13]"
+                className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden "
               >
                 {logo && !logoError ? (
                   <img
