@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ChevronDown, Search, User, LogIn } from 'lucide-react';
-import logo from "../../assets/logo.png";
-
+import logo from "@/assets/logo.png";
 // Try to import logo, but provide fallback if it doesn't exist
 
 
