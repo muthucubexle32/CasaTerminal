@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ChevronDown, Search, User, LogIn } from 'lucide-react';
-import logo from "./public/logo.png";
+import logo from "/logo.png";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -147,7 +147,7 @@ const Navbar = () => {
               <motion.div
                 whileHover={{ rotate: 360 }}
                 transition={{ duration: 0.5 }}
-                className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden bg-[#e9ddc8]"
+                className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden "
               >
                 {!logoError ? (
                   <img
