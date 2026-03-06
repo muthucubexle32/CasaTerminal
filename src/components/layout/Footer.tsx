@@ -7,7 +7,7 @@ import {
   Shield, Truck
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import logo from "@/assets/logo.png";
+
 interface FooterSection {
   title: string;
   links?: { name: string; link: string; }[];
@@ -171,37 +171,23 @@ const Footer = () => {
             viewport={{ once: true }}
             className="text-center"
           >
-            <motion.div variants={itemVariants} className="flex flex-col items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-             <motion.div
+            {/* Logo */}
+            <Link to="/" className="flex items-center space-x-2 group">
+              <motion.div
                 whileHover={{ rotate: 360 }}
                 transition={{ duration: 0.5 }}
-                className="w-12 h-12  rounded-lg flex items-center justify-center overflow-hidden"
+                className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden "
               >
-                {logo ? (
-                  <img
-                    src={logo}
-                    alt="Casa Terminal Logo"
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = "none";
-                      const parent = target.parentElement;
-                      if (parent) {
-                        const fallback = document.createElement("span");
-                        fallback.className = "text-[#502d13] font-bold text-xl";
-                        fallback.textContent = "CT";
-                        parent.appendChild(fallback);
-                      }
-                    }}
-                  />
-                ) : (
-                  <span className="text-[#502d13] font-bold text-xl">CT</span>
-                )}
+               <img
+                src="./src/assets/logo.png"
+                alt="Casa Terminal Logo"
+                className="w-full h-full object-cover"
+              />
               </motion.div>
-              <span className="font-display font-bold text-lg sm:text-xl md:text-2xl text-[#e9ddc8]">
+              <span className="text-2xl font-bold text-[#e9ddc8] group-hover:text-white transition-colors">
                 CASA TERMINAL
               </span>
-            </motion.div>
+            </Link>
             
             <motion.p variants={itemVariants} className="text-[#e9ddc8]/70 text-xs sm:text-sm md:text-base max-w-md mx-auto mb-4 sm:mb-6 leading-relaxed px-2">
               India's premier construction marketplace connecting builders, suppliers, and contractors with cutting-edge technology and trusted partnerships.
@@ -321,37 +307,22 @@ const Footer = () => {
             viewport={{ once: true }}
             className="space-y-4"
           >
-            <motion.div variants={itemVariants} className="flex items-center gap-3">
-             <motion.div
+           <Link to="/" className="flex items-center space-x-2 group">
+              <motion.div
                 whileHover={{ rotate: 360 }}
                 transition={{ duration: 0.5 }}
-                className="w-12 h-12  rounded-lg flex items-center justify-center overflow-hidden"
+                className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden "
               >
-                {logo ? (
-                  <img
-                    src={logo}
-                    alt="Casa Terminal Logo"
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = "none";
-                      const parent = target.parentElement;
-                      if (parent) {
-                        const fallback = document.createElement("span");
-                        fallback.className = "text-[#502d13] font-bold text-xl";
-                        fallback.textContent = "CT";
-                        parent.appendChild(fallback);
-                      }
-                    }}
-                  />
-                ) : (
-                  <span className="text-[#502d13] font-bold text-xl">CT</span>
-                )}
+               <img
+                src="./src/assets/logo.png"
+                alt="Casa Terminal Logo"
+                className="w-full h-full object-cover"
+              />
               </motion.div>
-              <span className="font-display font-bold text-xl text-[#e9ddc8]">
+              <span className="text-2xl font-bold text-[#e9ddc8] group-hover:text-white transition-colors">
                 CASA TERMINAL
               </span>
-            </motion.div>
+            </Link>
             
             <motion.p variants={itemVariants} className="text-[#e9ddc8]/70 text-sm leading-relaxed">
               India's premier construction marketplace connecting builders, suppliers, and contractors with cutting-edge technology and trusted partnerships.

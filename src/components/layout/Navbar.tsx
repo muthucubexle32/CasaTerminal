@@ -2,9 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ChevronDown, Search, User, LogIn } from 'lucide-react';
-import logo from "@/assets/logo.png";
-// Try to import logo, but provide fallback if it doesn't exist
-
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -150,26 +147,11 @@ const Navbar = () => {
                 transition={{ duration: 0.5 }}
                 className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden "
               >
-                {logo ? (
-                  <img
-                    src={logo}
-                    alt="Casa Terminal Logo"
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = "none";
-                      const parent = target.parentElement;
-                      if (parent) {
-                        const fallback = document.createElement("span");
-                        fallback.className = "text-[#502d13] font-bold text-xl";
-                        fallback.textContent = "CT";
-                        parent.appendChild(fallback);
-                      }
-                    }}
-                  />
-                ) : (
-                  <span className="text-[#502d13] font-bold text-xl">CT</span>
-                )}
+               <img
+                src="./src/assets/logo.png"
+                alt="Casa Terminal Logo"
+                className="w-full h-full object-cover"
+              />
               </motion.div>
               <span className="text-2xl font-bold text-[#e9ddc8] group-hover:text-white transition-colors">
                 CASA TERMINAL
