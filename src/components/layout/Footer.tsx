@@ -7,7 +7,7 @@ import {
   Shield, Truck
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import logo from "@/assets/logo.png";
+import logo from "../../assets/logo.png";
 
 interface FooterSection {
   title: string;
