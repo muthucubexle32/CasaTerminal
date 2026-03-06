@@ -7,7 +7,7 @@ import {
   Shield, Truck
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import logo from '../public/logo.png';
+import logo from "../public/logo.png";
 
 // Try to import logo with fallback
 
