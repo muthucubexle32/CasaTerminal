@@ -7,7 +7,10 @@ import {
   Shield, Truck
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import logo from '../../assets/logo.png';
+import logo from "@/assets/logo.png";
+
+// Try to import logo with fallback
+
 
 interface FooterSection {
   title: string;
@@ -177,9 +180,9 @@ const Footer = () => {
               <motion.div
                 whileHover={{ rotate: 360 }}
                 transition={{ duration: 0.5 }}
-                className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden "
+                className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden bg-[#502d13]"
               >
-                {!logoError ? (
+                {logo && !logoError ? (
                   <img
                     src={logo}
                     alt="Casa Terminal Logo"
@@ -317,9 +320,9 @@ const Footer = () => {
               <motion.div
                 whileHover={{ rotate: 360 }}
                 transition={{ duration: 0.5 }}
-                className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden "
+                className="w-12 h-12 rounded-lg flex items-center justify-center bg-[#502d13]"
               >
-                {!logoError ? (
+                {logo && !logoError ? (
                   <img
                     src={logo}
                     alt="Casa Terminal Logo"
