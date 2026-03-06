@@ -9,9 +9,6 @@ import {
 import { useState, useEffect } from 'react';
 import logo from "@/assets/logo.png";
 
-// Try to import logo with fallback
-
-
 interface FooterSection {
   title: string;
   links?: { name: string; link: string; }[];
@@ -182,7 +179,7 @@ const Footer = () => {
                 transition={{ duration: 0.5 }}
                 className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden "
               >
-                {logo && !logoError ? (
+                {!logoError ? (
                   <img
                     src={logo}
                     alt="Casa Terminal Logo"
@@ -322,7 +319,7 @@ const Footer = () => {
                 transition={{ duration: 0.5 }}
                 className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden "
               >
-                {logo && !logoError ? (
+                {!logoError ? (
                   <img
                     src={logo}
                     alt="Casa Terminal Logo"

@@ -3,8 +3,6 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ChevronDown, Search, User, LogIn } from 'lucide-react';
 import logo from "@/assets/logo.png";
-// Try to import logo with fallback
-
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -151,7 +149,7 @@ const Navbar = () => {
                 transition={{ duration: 0.5 }}
                 className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden "
               >
-                {logo && !logoError ? (
+                {!logoError ? (
                   <img
                     src={logo}
                     alt="Casa Terminal Logo"
