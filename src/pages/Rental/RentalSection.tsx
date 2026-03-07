@@ -10,9 +10,11 @@ import {
   EyeOff,
   AlertCircle,
   Truck,
-  Wrench,
+
   Calendar,
-  Shield
+  Shield,
+  CheckCircle,
+  ChevronRight
 } from 'lucide-react';
 
 const RentalSection = () => {
@@ -37,7 +39,6 @@ const RentalSection = () => {
     }
 
     if (Object.keys(newErrors).length === 0) {
-      // Handle login logic here
       console.log('Login attempt:', loginData);
       navigate('/rental/dashboard');
     } else {
@@ -45,183 +46,201 @@ const RentalSection = () => {
     }
   };
 
+  const benefits = [
+    { icon: Truck, text: 'List vehicles & equipment' },
+    { icon: Calendar, text: 'Manage bookings easily' },
+    { icon: Shield, text: 'Insurance included' },
+    { icon: CheckCircle, text: 'Verified customers' },
+  ];
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3 }}
-      className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 md:p-8 mt-6 sm:mt-8"
+      className="bg-white rounded-2xl shadow-xl overflow-hidden"
     >
-      <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
-        {/* Left Column - Info */}
-        <div className="space-y-4 sm:space-y-6">
-          <div>
-            <h3 className="text-xl sm:text-2xl font-bold text-secondary-500 mb-2">
-              Rental Support Membership
-            </h3>
-            <p className="text-sm sm:text-base text-gray-600">
-              List your construction equipment and vehicles for rent to contractors and builders.
-            </p>
-          </div>
+      {/* Header */}
+      <div className="bg-gradient-to-r from-primary-500 to-primary-600 px-6 py-4">
+        <h3 className="text-xl font-bold text-secondary-500">Rental Support Program</h3>
+        <p className="text-sm text-secondary-600/90">Join India's largest construction equipment rental network</p>
+      </div>
 
-          {/* Equipment Types */}
-          <div className="grid grid-cols-2 gap-2 sm:gap-3">
-            <div className="flex items-center space-x-2 bg-primary-50 p-2 sm:p-3 rounded-lg">
-              <Truck className="w-4 h-4 sm:w-5 sm:h-5 text-secondary-500" />
-              <span className="text-xs sm:text-sm font-medium">Vehicles</span>
-            </div>
-            <div className="flex items-center space-x-2 bg-primary-50 p-2 sm:p-3 rounded-lg">
-              <Wrench className="w-4 h-4 sm:w-5 sm:h-5 text-secondary-500" />
-              <span className="text-xs sm:text-sm font-medium">Tools</span>
-            </div>
-            <div className="flex items-center space-x-2 bg-primary-50 p-2 sm:p-3 rounded-lg">
-              <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-secondary-500" />
-              <span className="text-xs sm:text-sm font-medium">Equipment</span>
-            </div>
-            <div className="flex items-center space-x-2 bg-primary-50 p-2 sm:p-3 rounded-lg">
-              <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-secondary-500" />
-              <span className="text-xs sm:text-sm font-medium">Insured</span>
-            </div>
-          </div>
-
-          <div className="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4">
-            <p className="text-xs sm:text-sm text-green-800">
-              <span className="font-semibold">Insurance Covered:</span> All rentals come with basic insurance coverage for peace of mind.
-            </p>
-          </div>
-
-          <button
-            onClick={() => {
-              setShowLogin(false);
-              navigate('/rental/register');
-            }}
-            className="btn-primary w-full flex items-center justify-center space-x-2 text-sm sm:text-base py-2 sm:py-3"
-          >
-            <UserPlus className="w-4 h-4 sm:w-5 sm:h-5" />
-            <span>Register as Rental Support</span>
-          </button>
-        </div>
-
-        {/* Right Column - Login */}
-        <div className="md:border-l md:border-gray-200 md:pl-6 lg:pl-8">
-          <div className="flex items-center space-x-2 mb-4 sm:mb-6">
-            <LogIn className="w-5 h-5 sm:w-6 sm:h-6 text-secondary-500" />
-            <h3 className="text-lg sm:text-xl font-semibold text-secondary-500">
-              Existing Rental Login
-            </h3>
-          </div>
-
-          {!showLogin ? (
-            <div className="text-center py-6 sm:py-8">
-              <p className="text-sm sm:text-base text-gray-600 mb-4">
-                Already have a rental account? Login to manage your listings.
-              </p>
-              <button
-                onClick={() => setShowLogin(true)}
-                className="btn-secondary inline-flex items-center space-x-2 text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-2.5"
-              >
-                <LogIn className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span>Click to Login</span>
-              </button>
-            </div>
-          ) : (
-            <motion.form
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              onSubmit={handleLogin}
-              className="space-y-4"
-            >
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                  Rental ID
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    value={loginData.rentalId}
-                    onChange={(e) => {
-                      setLoginData({ ...loginData, rentalId: e.target.value });
-                      setErrors({ ...errors, rentalId: '' });
-                    }}
-                    className={`w-full pl-9 sm:pl-10 pr-4 py-2 sm:py-2.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 ${
-                      errors.rentalId ? 'border-red-500' : 'border-gray-200'
-                    }`}
-                    placeholder="Enter your rental ID"
-                  />
-                </div>
-                {errors.rentalId && (
-                  <p className="mt-1 text-xs text-red-500 flex items-center">
-                    <AlertCircle className="w-3 h-3 mr-1" />
-                    {errors.rentalId}
-                  </p>
-                )}
+      <div className="p-6 md:p-8">
+        <div className="grid md:grid-cols-2 gap-8">
+          {/* Left Column - Info */}
+          <div className="space-y-6">
+            {/* Stats */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-primary-50 rounded-lg p-4 text-center">
+                <div className="text-2xl font-bold text-secondary-500">500+</div>
+                <div className="text-xs text-gray-600">Active Providers</div>
               </div>
+              <div className="bg-primary-50 rounded-lg p-4 text-center">
+                <div className="text-2xl font-bold text-secondary-500">2000+</div>
+                <div className="text-xs text-gray-600">Equipment Listed</div>
+              </div>
+            </div>
 
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                  Password
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    value={loginData.password}
-                    onChange={(e) => {
-                      setLoginData({ ...loginData, password: e.target.value });
-                      setErrors({ ...errors, password: '' });
-                    }}
-                    className={`w-full pl-9 sm:pl-10 pr-10 py-2 sm:py-2.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 ${
-                      errors.password ? 'border-red-500' : 'border-gray-200'
-                    }`}
-                    placeholder="Enter your password"
-                  />
+            {/* Benefits */}
+            <div className="space-y-3">
+              <h4 className="font-semibold text-secondary-500">Why join as Rental Provider?</h4>
+              <div className="grid grid-cols-2 gap-3">
+                {benefits.map((benefit, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <div className="p-1.5 bg-primary-100 rounded-lg">
+                      <benefit.icon className="w-4 h-4 text-secondary-500" />
+                    </div>
+                    <span className="text-xs text-gray-700">{benefit.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Equipment Categories */}
+            <div>
+              <h4 className="font-semibold text-secondary-500 mb-3">Equipment Categories</h4>
+              <div className="flex flex-wrap gap-2">
+                {['Heavy Equipment', 'Construction Tools', 'Scaffolding', 'Generators', 'Material Handling'].map((cat, idx) => (
+                  <span key={idx} className="px-3 py-1 bg-primary-100 text-secondary-500 rounded-full text-xs font-medium">
+                    {cat}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* CTA Button */}
+            <button
+              onClick={() => navigate('/rental/register')}
+              className="w-full bg-secondary-500 text-white py-3 rounded-lg font-semibold hover:bg-secondary-600 transition-colors flex items-center justify-center gap-2 group"
+            >
+              <UserPlus className="w-5 h-5" />
+              <span>Register as Rental Provider</span>
+              <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </button>
+          </div>
+
+          {/* Right Column - Login */}
+          <div className="md:border-l md:border-gray-200 md:pl-8">
+            <div className="flex items-center gap-2 mb-6">
+              <div className="p-2 bg-primary-100 rounded-lg">
+                <LogIn className="w-5 h-5 text-secondary-500" />
+              </div>
+              <h3 className="text-lg font-semibold text-secondary-500">Existing Provider Login</h3>
+            </div>
+
+            {!showLogin ? (
+              <div className="text-center py-8">
+                <p className="text-gray-600 mb-4">
+                  Already have a rental account? Login to manage your equipment and bookings.
+                </p>
+                <button
+                  onClick={() => setShowLogin(true)}
+                  className="btn-secondary inline-flex items-center gap-2 px-6 py-2.5"
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span>Click to Login</span>
+                </button>
+              </div>
+            ) : (
+              <motion.form
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                onSubmit={handleLogin}
+                className="space-y-4"
+              >
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Rental ID
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      value={loginData.rentalId}
+                      onChange={(e) => {
+                        setLoginData({ ...loginData, rentalId: e.target.value });
+                        setErrors({ ...errors, rentalId: '' });
+                      }}
+                      className={`w-full pl-10 pr-4 py-2.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 ${
+                        errors.rentalId ? 'border-red-500' : 'border-gray-200'
+                      }`}
+                      placeholder="Enter your rental ID"
+                    />
+                  </div>
+                  {errors.rentalId && (
+                    <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
+                      {errors.rentalId}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={loginData.password}
+                      onChange={(e) => {
+                        setLoginData({ ...loginData, password: e.target.value });
+                        setErrors({ ...errors, password: '' });
+                      }}
+                      className={`w-full pl-10 pr-10 py-2.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 ${
+                        errors.password ? 'border-red-500' : 'border-gray-200'
+                      }`}
+                      placeholder="Enter your password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="w-4 h-4 text-gray-400" />
+                      ) : (
+                        <Eye className="w-4 h-4 text-gray-400" />
+                      )}
+                    </button>
+                  </div>
+                  {errors.password && (
+                    <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
+                      {errors.password}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between">
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                    onClick={() => setShowLogin(false)}
+                    className="text-sm text-gray-600 hover:text-secondary-500"
                   >
-                    {showPassword ? (
-                      <EyeOff className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
-                    ) : (
-                      <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
-                    )}
+                    ← Back
+                  </button>
+                  <button
+                    type="button"
+                    className="text-sm text-secondary-500 hover:text-primary-600"
+                  >
+                    Forgot Password?
                   </button>
                 </div>
-                {errors.password && (
-                  <p className="mt-1 text-xs text-red-500 flex items-center">
-                    <AlertCircle className="w-3 h-3 mr-1" />
-                    {errors.password}
-                  </p>
-                )}
-              </div>
 
-              <div className="flex items-center justify-between">
                 <button
-                  type="button"
-                  onClick={() => setShowLogin(false)}
-                  className="text-xs sm:text-sm text-gray-600 hover:text-secondary-500"
+                  type="submit"
+                  className="w-full bg-secondary-500 text-white py-2.5 rounded-lg font-semibold hover:bg-secondary-600 transition-colors flex items-center justify-center gap-2"
                 >
-                  Back
+                  <LogIn className="w-4 h-4" />
+                  <span>Login to Dashboard</span>
                 </button>
-                <button
-                  type="button"
-                  className="text-xs sm:text-sm text-secondary-500 hover:text-primary-600"
-                >
-                  Forgot Password?
-                </button>
-              </div>
-
-              <button
-                type="submit"
-                className="btn-primary w-full flex items-center justify-center space-x-2 text-sm sm:text-base py-2 sm:py-2.5"
-              >
-                <LogIn className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span>Login</span>
-              </button>
-            </motion.form>
-          )}
+              </motion.form>
+            )}
+          </div>
         </div>
       </div>
     </motion.div>

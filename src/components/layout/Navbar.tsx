@@ -291,9 +291,9 @@ const Navbar = () => {
                 aria-label={isOpen ? "Close menu" : "Open menu"}
               >
                 {isOpen ? (
-                  <X className="w-5 h-5 sm:w-6 sm:h-6 text-[#e9ddc8]" />
+                  <X className="w-5 h-10 sm:w-6 sm:h-6 text-[#e9ddc8]" />
                 ) : (
-                  <Menu className="w-5 h-5 sm:w-6 sm:h-6 text-[#e9ddc8]" />
+                  <Menu className="w-5 h-10 sm:w-6 sm:h-6 text-[#e9ddc8]" />
                 )}
               </button>
             </div>

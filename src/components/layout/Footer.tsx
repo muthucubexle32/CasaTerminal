@@ -30,11 +30,7 @@ interface ContactInfoItem {
   href?: string;
 }
 
-interface MobileNavItem {
-  icon: React.ElementType;
-  label: string;
-  href: string;
-}
+
 
 const Footer = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -96,12 +92,6 @@ const Footer = () => {
     { Icon: Phone, text: "+91 xxxxx xxxxx", href: "tel:+91xxxxx xxxxx" },
     { Icon: MessageCircle, text: "+91 xxxxx xxxxx", href: "tel:+91xxxxx xxxxx" },
     { Icon: Mail, text: "info@casaterminal.com", href: "mailto:info@casaterminal.com" }
-  ];
-
-  const mobileNavItems: MobileNavItem[] = [
-    { icon: Phone, label: "Call", href: "tel:+91xxxxx xxxxx" },
-    { icon: Mail, label: "Email", href: "mailto:info@casaterminal.com" },
-    { icon: MessageCircle, label: "WhatsApp", href: "#" },
   ];
 
   const containerVariants = {
@@ -556,20 +546,7 @@ const Footer = () => {
         <ArrowUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 group-hover:-translate-y-1 transition-transform" />
       </motion.button>
 
-      {/* Mobile Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-[#3d220f] backdrop-blur-md border-t border-[#e9ddc8]/10 py-1.5 px-2 flex justify-around items-center z-40 md:hidden">
-        {mobileNavItems.map(({ icon: Icon, label, href }) => (
-          <motion.a
-            key={label}
-            href={href}
-            whileTap={{ scale: 0.9 }}
-            className="flex flex-col items-center gap-0.5 text-[#e9ddc8]/60 hover:text-[#e9ddc8] transition-colors px-2 py-1"
-          >
-            <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
-            <span className="text-[8px] sm:text-[10px]">{label}</span>
-          </motion.a>
-        ))}
-      </div>
+     
 
       {/* Add bottom padding on mobile to account for fixed nav */}
       <style>{`

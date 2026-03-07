@@ -14,7 +14,12 @@ import {
   MapPin,
   FileText,
   CreditCard,
-  AlertCircle
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  Mail as MailIcon,
+  Phone as PhoneIcon,
+  
 } from 'lucide-react';
 
 const steps = [
@@ -26,6 +31,8 @@ const steps = [
 
 const SellerRegistration = () => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [applicationId, setApplicationId] = useState('');
   const [formData, setFormData] = useState({
     // Step 1
     fullName: '',
@@ -50,6 +57,13 @@ const SellerRegistration = () => {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const navigate = useNavigate();
+
+  // Generate a random application ID
+  const generateApplicationId = () => {
+    const timestamp = Date.now().toString().slice(-6);
+    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+    return `SEL-${timestamp}-${random}`;
+  };
 
   const validateStep = (step: number) => {
     const newErrors: Record<string, string> = {};
@@ -86,18 +100,31 @@ const SellerRegistration = () => {
   const handleNext = () => {
     if (validateStep(currentStep)) {
       setCurrentStep(currentStep + 1);
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const handleBack = () => {
     setCurrentStep(currentStep - 1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSubmit = () => {
     if (validateStep(currentStep)) {
+      // Generate application ID
+      const newAppId = generateApplicationId();
+      setApplicationId(newAppId);
+      
       // Handle submission
       console.log('Form submitted:', formData);
-      navigate('/seller/status');
+      console.log('Application ID:', newAppId);
+      
+      // Show thank you screen
+      setIsSubmitted(true);
+      
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -115,11 +142,18 @@ const SellerRegistration = () => {
     }
   };
 
+ 
+
+  const handleGoHome = () => {
+    navigate('/');
+  };
+
   const renderStepContent = () => {
     switch (currentStep) {
       case 1:
         return (
           <motion.div
+            key="step1"
             initial={{ x: 20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -20, opacity: 0 }}
@@ -243,6 +277,7 @@ const SellerRegistration = () => {
       case 2:
         return (
           <motion.div
+            key="step2"
             initial={{ x: 20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -20, opacity: 0 }}
@@ -386,6 +421,7 @@ const SellerRegistration = () => {
       case 3:
         return (
           <motion.div
+            key="step3"
             initial={{ x: 20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -20, opacity: 0 }}
@@ -462,6 +498,7 @@ const SellerRegistration = () => {
       case 4:
         return (
           <motion.div
+            key="step4"
             initial={{ x: 20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -20, opacity: 0 }}
@@ -540,6 +577,136 @@ const SellerRegistration = () => {
         return null;
     }
   };
+
+  // Thank You Screen
+  if (isSubmitted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-primary-50 to-white py-12">
+        <div className="max-w-2xl mx-auto container-padding">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="bg-white rounded-2xl shadow-xl p-8 md:p-12 text-center"
+          >
+            {/* Success Animation */}
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+              className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6"
+            >
+              <CheckCircle className="w-12 h-12 text-green-600" />
+            </motion.div>
+
+            {/* Thank You Message */}
+            <motion.h1
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="text-3xl md:text-4xl font-bold text-secondary-500 mb-4"
+            >
+              Thank You!
+            </motion.h1>
+
+            <motion.p
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="text-gray-600 mb-6"
+            >
+              Your application has been submitted successfully. Our team will review your documents and verify your details.
+            </motion.p>
+
+            {/* Application ID */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="bg-primary-50 rounded-xl p-6 mb-6"
+            >
+              <p className="text-sm text-gray-600 mb-2">Your Application ID</p>
+              <p className="text-2xl font-mono font-bold text-secondary-500">{applicationId}</p>
+            </motion.div>
+
+            {/* What's Next */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="text-left mb-8"
+            >
+              <h3 className="font-semibold text-secondary-500 mb-3 flex items-center gap-2">
+                <Clock className="w-5 h-5" />
+                What's Next?
+              </h3>
+              <ul className="space-y-3">
+                <li className="flex items-start gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>Our team will verify your documents within 24-48 hours</span>
+                </li>
+                <li className="flex items-start gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>You'll receive an email with your Seller ID once verified</span>
+                </li>
+                <li className="flex items-start gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>You can then login and start listing your products</span>
+                </li>
+              </ul>
+            </motion.div>
+
+            {/* Contact Support */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.7 }}
+              className="bg-blue-50 rounded-lg p-4 mb-8"
+            >
+              <p className="text-sm text-blue-800 mb-2">Need help? Contact our support team</p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="mailto:support@casaterminal.com" className="flex items-center gap-2 text-blue-600 hover:text-blue-700">
+                  <MailIcon className="w-4 h-4" />
+                  <span className="text-sm">support@casaterminal.com</span>
+                </a>
+                <span className="hidden sm:inline text-blue-300">|</span>
+                <a href="tel:+919876543210" className="flex items-center gap-2 text-blue-600 hover:text-blue-700">
+                  <PhoneIcon className="w-4 h-4" />
+                  <span className="text-sm">+91 xxxxx xxxxx</span>
+                </a>
+              </div>
+            </motion.div>
+
+            {/* Action Buttons */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.8 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center"
+            >
+             
+              <button
+                onClick={handleGoHome}
+                className="btn-secondary flex items-center justify-center gap-2 px-6 py-3"
+              >
+                Return to Home
+              </button>
+            </motion.div>
+
+            {/* Note */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.9 }}
+              className="text-xs text-gray-500 mt-6"
+            >
+              You will receive an email confirmation shortly. Please check your spam folder if you don't see it.
+            </motion.p>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary-50 to-white py-12">

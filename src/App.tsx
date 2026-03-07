@@ -21,9 +21,9 @@ function App() {
             <Route path="/member" element={<MemberPage />} />
             <Route path="/seller/register" element={<SellerRegistration />} />
             <Route path="/contractor/register" element={<ContractorRegistration />} />
-            <Route path="/rental/register" element={<RentalRegistration />} />
             <Route path="/contractors" element={<ContractorListing />} />
             <Route path="/contractor/:id" element={<ContractorDetail />} />
+            <Route path="/rental/register" element={<RentalRegistration />} />
             <Route path="/rentals" element={<RentalListing />} />
             <Route path="/rental/:id" element={<RentalDetail />} />
           </Routes>
