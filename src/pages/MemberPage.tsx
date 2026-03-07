@@ -9,19 +9,16 @@ import {
   Shield,
   Star,
   Clock,
-  Users
+  Users,
+  X
 } from 'lucide-react';
 import SellerSection from './Seller/SellerSection';
 import ContractorSection from './Contractor/ContractorSection';
 import RentalSection from './Rental/RentalSection';
-// Remove these if they're not needed:
-// import { SellerSection, SellerRegistration, SellerDashboard } from './Seller';
-// import { ContractorSection, ContractorRegistration, ContractorDashboard, ContractorListing, ContractorDetail } from './Contractor';
-// import { RentalSection, RentalRegistration, RentalDashboard, RentalListing, RentalDetail } from './Rental';
 
 const MemberPage = () => {
-  // ... rest of the component remains the same
   const [activeMember, setActiveMember] = useState<'seller' | 'contractor' | 'rental' | null>(null);
+  const [expandedCard, setExpandedCard] = useState<string | null>(null);
 
   const membershipCards = [
     {
@@ -54,7 +51,20 @@ const MemberPage = () => {
   ];
 
   const handleCardClick = (id: typeof activeMember) => {
-    setActiveMember(activeMember === id ? null : id);
+    if (expandedCard === id) {
+      // If clicking the same card, close it
+      setExpandedCard(null);
+      setActiveMember(null);
+    } else {
+      // Open new card
+      setExpandedCard(id);
+      setActiveMember(id);
+    }
+  };
+
+  const handleClose = () => {
+    setExpandedCard(null);
+    setActiveMember(null);
   };
 
   return (
@@ -81,79 +91,106 @@ const MemberPage = () => {
           </p>
         </motion.div>
 
-        {/* Membership Cards */}
-        <div className="grid md:grid-cols-3 gap-8 mb-12">
+        {/* Membership Cards with Expanded Sections */}
+        <div className="space-y-8">
           {membershipCards.map((card, index) => (
-            <motion.div
-              key={card.id}
-              initial={{ y: 50, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              whileHover={{ y: -5 }}
-              className={`relative cursor-pointer group ${
-                activeMember === card.id ? 'ring-4 ring-secondary-500' : ''
-              }`}
-              onClick={() => handleCardClick(card.id)}
-            >
-              <div className={`absolute inset-0 bg-gradient-to-r ${card.color} opacity-0 group-hover:opacity-10 rounded-2xl transition-opacity`} />
-              
-              <div className="relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all">
-                {/* Icon */}
-                <motion.div
-                  whileHover={{ rotate: 360 }}
-                  transition={{ duration: 0.6 }}
-                  className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${card.color} p-4 mb-6`}
-                >
-                  <card.icon className="w-full h-full text-white" />
-                </motion.div>
-
-                <h2 className="text-2xl font-bold text-secondary-500 mb-2">
-                  {card.title}
-                </h2>
+            <div key={card.id} className="relative">
+              {/* Membership Card */}
+              <motion.div
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                whileHover={{ y: expandedCard === card.id ? 0 : -5 }}
+                className={`relative cursor-pointer group ${
+                  expandedCard === card.id ? 'ring-4 ring-secondary-500 rounded-2xl' : ''
+                }`}
+                onClick={() => handleCardClick(card.id)}
+              >
+                <div className={`absolute inset-0 bg-gradient-to-r ${card.color} opacity-0 group-hover:opacity-10 rounded-2xl transition-opacity`} />
                 
-                <p className="text-gray-600 mb-4">
-                  {card.description}
-                </p>
+                <div className="relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all">
+                  {/* Close button when expanded */}
+                  {expandedCard === card.id && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleClose();
+                      }}
+                      className="absolute top-4 right-4 z-10 p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors"
+                    >
+                      <X className="w-5 h-5 text-gray-600" />
+                    </button>
+                  )}
 
-                {/* Stats */}
-                <div className="flex items-center space-x-2 text-sm text-primary-600 mb-4">
-                  <CheckCircle className="w-4 h-4" />
-                  <span>{card.stats}</span>
+                  {/* Icon */}
+                  <motion.div
+                    whileHover={{ rotate: 360 }}
+                    transition={{ duration: 0.6 }}
+                    className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${card.color} p-4 mb-6`}
+                  >
+                    <card.icon className="w-full h-full text-white" />
+                  </motion.div>
+
+                  <h2 className="text-2xl font-bold text-secondary-500 mb-2">
+                    {card.title}
+                  </h2>
+                  
+                  <p className="text-gray-600 mb-4">
+                    {card.description}
+                  </p>
+
+                  {/* Stats */}
+                  <div className="flex items-center space-x-2 text-sm text-primary-600 mb-4">
+                    <CheckCircle className="w-4 h-4" />
+                    <span>{card.stats}</span>
+                  </div>
+
+                  {/* Features */}
+                  <ul className="space-y-2 mb-6">
+                    {card.features.map((feature, idx) => (
+                      <li key={idx} className="flex items-center space-x-2 text-sm text-gray-600">
+                        <ChevronRight className="w-4 h-4 text-primary-600" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  {/* CTA */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-secondary-500 font-semibold group-hover:underline">
+                      {expandedCard === card.id ? 'Click to close' : 'Get Started'}
+                    </span>
+                    <ChevronRight className={`w-5 h-5 text-secondary-500 transition-transform ${
+                      expandedCard === card.id ? 'rotate-90' : 'group-hover:translate-x-1'
+                    }`} />
+                  </div>
+
+                  {/* Verification Badge */}
+                  <div className="absolute top-4 right-4">
+                    <Shield className="w-6 h-6 text-green-500" />
+                  </div>
                 </div>
+              </motion.div>
 
-                {/* Features */}
-                <ul className="space-y-2 mb-6">
-                  {card.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-center space-x-2 text-sm text-gray-600">
-                      <ChevronRight className="w-4 h-4 text-primary-600" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                {/* CTA */}
-                <div className="flex items-center justify-between">
-                  <span className="text-secondary-500 font-semibold group-hover:underline">
-                    Get Started
-                  </span>
-                  <ChevronRight className="w-5 h-5 text-secondary-500 group-hover:translate-x-1 transition-transform" />
-                </div>
-
-                {/* Verification Badge */}
-                <div className="absolute top-4 right-4">
-                  <Shield className="w-6 h-6 text-green-500" />
-                </div>
-              </div>
-            </motion.div>
+              {/* Expanded Section - Directly below the card */}
+              <AnimatePresence>
+                {expandedCard === card.id && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -20, height: 0 }}
+                    animate={{ opacity: 1, y: 0, height: 'auto' }}
+                    exit={{ opacity: 0, y: -20, height: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="mt-4"
+                  >
+                    {card.id === 'seller' && <SellerSection />}
+                    {card.id === 'contractor' && <ContractorSection />}
+                    {card.id === 'rental' && <RentalSection />}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           ))}
         </div>
-
-        {/* Dynamic Sections */}
-        <AnimatePresence mode="wait">
-          {activeMember === 'seller' && <SellerSection />}
-          {activeMember === 'contractor' && <ContractorSection />}
-          {activeMember === 'rental' && <RentalSection />}
-        </AnimatePresence>
 
         {/* Benefits Section */}
         <motion.div

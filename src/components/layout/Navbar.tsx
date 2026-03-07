@@ -339,7 +339,7 @@ const Navbar = () => {
                               <div className="pb-3 sm:pb-4 space-y-3 sm:space-y-4">
                                 {link.megaMenu.columns.map((column, idx) => (
                                   <div key={idx}>
-                                    <h4 className="text-[#e9ddc8]/60 text-xs sm:text-sm font-semibold mb-1 sm:mb-2 px-2">
+                                    <h4 className="text-[#ece3d4] text-lg sm:text-sm font-semibold mb-1 sm:mb-2 px-2">
                                       {column.title}
                                     </h4>
                                     <ul className="space-y-1 sm:space-y-2">
