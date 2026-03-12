@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ChevronDown, Search, User, LogIn } from 'lucide-react';
 import logo from "/logo.png";
@@ -58,6 +58,7 @@ const Navbar = () => {
   );
   const [logoError, setLogoError] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -110,7 +111,7 @@ const Navbar = () => {
 
   const scrollToSection = (sectionId: string) => {
     if (location.pathname !== '/') {
-      window.location.href = `/#${sectionId}`;
+      navigate(`/#${sectionId}`);
     } else {
       const element = document.getElementById(sectionId);
       if (element) {
@@ -125,9 +126,15 @@ const Navbar = () => {
     if (href.startsWith('#')) {
       scrollToSection(href.substring(1));
     } else {
-      // Handle home link
-      window.location.href = href;
+      navigate(href);
+      window.scrollTo(0, 0);
     }
+  };
+
+  // Perfect navigation to Member page
+  const handleMemberNavigation = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setIsOpen(false);
   };
 
   // Determine device type based on window width
@@ -146,7 +153,7 @@ const Navbar = () => {
         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
           <div className="flex justify-between items-center h-14 sm:h-16 md:h-20">
             {/* Logo - Responsive sizing */}
-            <Link to="/" className="flex items-center space-x-1 sm:space-x-2 group">
+            <Link to="/" onClick={() => window.scrollTo(0, 0)} className="flex items-center space-x-1 sm:space-x-2 group">
               <motion.div
                 whileHover={{ rotate: 360 }}
                 transition={{ duration: 0.5 }}
@@ -219,7 +226,7 @@ const Navbar = () => {
                           transition={{ duration: 0.2 }}
                           onMouseEnter={() => setActiveMegaMenu(link.label)}
                           onMouseLeave={() => setActiveMegaMenu(null)}
-                          className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[700px] xl:w-[800px] bg-[#502d13] rounded-lg shadow-xl border border-[#e9ddc8]/20 overflow-hidden"
+                          className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[700px] xl:w-[650px] bg-[#502d13] rounded-lg shadow-xl border border-[#e9ddc8]/20 overflow-hidden"
                         >
                           <div className="grid grid-cols-3 gap-4 xl:gap-6 p-4 xl:p-6">
                             {link.megaMenu.columns.map((column, idx) => (
@@ -273,13 +280,13 @@ const Navbar = () => {
                 <User className="w-4 h-4 sm:w-5 sm:h-5" />
               </motion.a>
 
-              {/* Member button - responsive text */}
+              {/* Member button - perfectly routes to member page */}
               <Link
                 to="/member"
+                onClick={handleMemberNavigation}
                 className="bg-[#e9ddc8] text-[#502d13] px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-lg font-semibold hover:bg-white transition-colors flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm md:text-base"
               >
                 <LogIn className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
-            
                 <span className="hidden min-[480px]:inline sm:hidden">Join as Member</span>
                 <span className="hidden sm:inline">Become a Member</span>
               </Link>
@@ -381,19 +388,19 @@ const Navbar = () => {
                 <div className="pt-3 sm:pt-4 grid grid-cols-2 gap-2 sm:gap-3">
                   <Link
                     to="/member"
-                    onClick={() => setIsOpen(false)}
+                    onClick={handleMemberNavigation}
                     className="bg-[#e9ddc8] text-[#502d13] px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-center hover:bg-white transition-colors flex items-center justify-center space-x-1 sm:space-x-2 text-xs sm:text-sm"
                   >
                     <LogIn className="w-3 h-3 sm:w-4 sm:h-4" />
                     <span>Join</span>
                   </Link>
-                  <a
-                    href="#"
+                  <Link
+                    to="/member"
+                    onClick={handleMemberNavigation}
                     className="bg-transparent border border-[#e9ddc8]/30 text-[#e9ddc8] px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-center hover:bg-[#e9ddc8]/10 transition-colors text-xs sm:text-sm"
-                    onClick={() => setIsOpen(false)}
                   >
                     Sign In
-                  </a>
+                  </Link>
                 </div>
               </div>
             </motion.div>

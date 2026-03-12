@@ -153,4 +153,10 @@
   .gradient-bg {
     background: linear-gradient(to bottom right, #faf0e0, #f5e1c1);
   }
+  /* Add to your global CSS file */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 }
