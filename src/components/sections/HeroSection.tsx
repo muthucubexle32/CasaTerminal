@@ -120,7 +120,7 @@ const HeroSection = () => {
   return (
     <section 
       ref={containerRef} 
-      className=" h-[80vh] overflow-hidden bg-gradient-to-b from-[#502d13] to-[#7b4a26]"
+      className=" h-[100vh] overflow-hidden bg-gradient-to-b from-[#502d13] to-[#502d13]"
     >
       {/* Background Image - REQUIREMENT: Make it still (removed rotation transforms) */}
       <motion.div 
