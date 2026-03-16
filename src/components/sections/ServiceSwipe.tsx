@@ -130,17 +130,7 @@ const ServiceCarousel = () => {
     setTouchEnd(null);
   };
 
-  const scrollToIndex = (index: number) => {
-    if (scrollRef.current) {
-      const cardWidth = isMobile ? 260 : isTablet ? 280 : 320;
-      const gap = 24;
-      scrollRef.current.scrollTo({
-        left: index * (cardWidth + gap),
-        behavior: 'smooth',
-      });
-      setCurrentIndex(index);
-    }
-  };
+ 
 
   const handleScroll = () => {
     if (scrollRef.current) {
@@ -375,21 +365,7 @@ const ServiceCarousel = () => {
             ))}
           </div>
 
-          {/* Pagination Dots */}
-          <div className="flex justify-center gap-1.5 sm:gap-2 mt-3 sm:mt-4 md:mt-5 lg:mt-6">
-            {services.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => scrollToIndex(i)}
-                className={`h-1.5 sm:h-2 rounded-full transition-all duration-300 ${
-                  i === currentIndex 
-                    ? 'w-4 sm:w-5 md:w-6 bg-[#502d13]' 
-                    : 'w-1.5 sm:w-2 bg-[#502d13]/30 hover:bg-[#502d13]/50'
-                }`}
-                aria-label={`Go to slide ${i + 1}`}
-              />
-            ))}
-          </div>
+        
         </div>
 
         {/* View All Link */}
