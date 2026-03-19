@@ -1,15 +1,39 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
+import { Toaster } from 'react-hot-toast';
 import Layout from './components/layout/Layout';
+import Navbar from './components/layout/Navbar';
+import Footer from './components/layout/Footer';
 import LandingPage from './pages/LandingPage';
 import MemberPage from './pages/MemberPage';
+
+// Auth Pages
+import AdminLoginPage from './pages/auth/AdminLoginPage';
+import UserLoginPage from './pages/auth/UserLoginPage';
+import ProtectedRoute from './components/admin/auth/ProtectedRoute';
+
+// Admin Components
+import AdminLayout from './components/admin/AdminLayout';
+import Dashboard from './pages/admin/Dashboard';
+import SellerManagement from './pages/admin/SellerManagement';
+import ContractorManagement from './pages/admin/ContractorManagement';
+import RentalManagement from './pages/admin/RentalManagement';
+import ProductsManagement from './pages/admin/ProductsManagement';
+import PaymentsManagement from './pages/admin/PaymentsManagement';
+import Reports from './pages/admin/Reports';
+import Settings from './pages/admin/Settings';
+
+// Seller Pages
 import SellerRegistration from './pages/Seller/SellerRegistration';
 import SellerDashboard from './pages/Seller/SellerDashboard';
+
+// Contractor Pages
 import ContractorRegistration from './pages/Contractor/ContractorRegistration';
 import ContractorDashboard from './pages/Contractor/ContractorDashboard';
 import ContractorListing from './pages/Contractor/ContractorListing';
 import ContractorDetail from './pages/Contractor/ContractorDetail';
 
+// Rental Pages
 import RentalRegistration from './pages/Rental/RentalRegistration';
 import RentalDashboard from './pages/Rental/RentalDashboard';
 import RentalListing from './pages/Rental/RentalListing';
@@ -18,25 +42,167 @@ import RentalDetail from './pages/Rental/RentalDetail';
 function App() {
   return (
     <Router>
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: '#10b981',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            duration: 4000,
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
+      
       <AnimatePresence mode="wait">
-        <Layout>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/member" element={<MemberPage />} />
-            <Route path="/seller/register" element={<SellerRegistration />} />
-            <Route path="/seller/dashboard" element={<SellerDashboard />} />
+        <Routes>
+          {/* Public Routes with Navbar and Footer */}
+          <Route
+            path="/"
+            element={
+              <>
+                <Navbar />
+                <LandingPage />
+                <Footer />
+              </>
+            }
+          />
+          <Route
+            path="/member"
+            element={
+              <>
+                <Navbar />
+                <MemberPage />
+                <Footer />
+              </>
+            }
+          />
+          
+          {/* Auth Routes */}
+          <Route path="/login" element={<UserLoginPage />} />
+          <Route path="/admin/login" element={<AdminLoginPage />} />
 
-            <Route path="/contractor/register" element={<ContractorRegistration />} />
-            <Route path="/contractor/dashboard" element={<ContractorDashboard />} />
-            <Route path="/contractors" element={<ContractorListing />} />
-            <Route path="/contractor/:id" element={<ContractorDetail />} />
+          {/* Public Listings (with Layout) */}
+          <Route
+            path="/contractors"
+            element={
+              <Layout>
+                <ContractorListing />
+              </Layout>
+            }
+          />
+          <Route
+            path="/contractor/:id"
+            element={
+              <Layout>
+                <ContractorDetail />
+              </Layout>
+            }
+          />
+          <Route
+            path="/rentals"
+            element={
+              <Layout>
+                <RentalListing />
+              </Layout>
+            }
+          />
+          <Route
+            path="/rental/:id"
+            element={
+              <Layout>
+                <RentalDetail />
+              </Layout>
+            }
+          />
 
-            <Route path="/rental/register" element={<RentalRegistration />} />
-            <Route path="/rental/dashboard" element={<RentalDashboard />} />
-            <Route path="/rentals" element={<RentalListing />} />
-            <Route path="/rental/:id" element={<RentalDetail />} />
-          </Routes>
-        </Layout>
+          {/* Protected Admin Routes */}
+          <Route element={<ProtectedRoute allowedTypes={['admin']} />}>
+            <Route element={<AdminLayout />}>
+              <Route path="/admin/dashboard" element={<Dashboard />} />
+              <Route path="/admin/sellers" element={<SellerManagement />} />
+              <Route path="/admin/contractors" element={<ContractorManagement />} />
+              <Route path="/admin/rentals" element={<RentalManagement />} />
+              <Route path="/admin/products" element={<ProductsManagement />} />
+              <Route path="/admin/payments" element={<PaymentsManagement />} />
+              <Route path="/admin/reports" element={<Reports />} />
+              <Route path="/admin/settings" element={<Settings />} />
+            </Route>
+          </Route>
+
+          {/* Protected User Routes (with Layout) */}
+          <Route element={<ProtectedRoute allowedTypes={['seller', 'contractor', 'rental', 'customer']} />}>
+            {/* Seller Routes */}
+            <Route
+              path="/seller/register"
+              element={
+                <Layout>
+                  <SellerRegistration />
+                </Layout>
+              }
+            />
+            <Route
+              path="/seller/dashboard"
+              element={
+                <Layout>
+                  <SellerDashboard />
+                </Layout>
+              }
+            />
+
+            {/* Contractor Routes */}
+            <Route
+              path="/contractor/register"
+              element={
+                <Layout>
+                  <ContractorRegistration />
+                </Layout>
+              }
+            />
+            <Route
+              path="/contractor/dashboard"
+              element={
+                <Layout>
+                  <ContractorDashboard />
+                </Layout>
+              }
+            />
+
+            {/* Rental Routes */}
+            <Route
+              path="/rental/register"
+              element={
+                <Layout>
+                  <RentalRegistration />
+                </Layout>
+              }
+            />
+            <Route
+              path="/rental/dashboard"
+              element={
+                <Layout>
+                  <RentalDashboard />
+                </Layout>
+              }
+            />
+          </Route>
+
+          {/* Fallback Route */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </AnimatePresence>
     </Router>
   );

@@ -1,51 +1,9 @@
+// src/components/layout/Navbar.tsx
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ChevronDown, Search, User, LogIn } from 'lucide-react';
+import { Menu, X, ChevronDown, Search, User, LogIn, Package, Wrench,  } from 'lucide-react';
 import logo from "/logo.png";
-
-const navLinks = [
-  { label: "Home", href: "/" },
-  {
-    label: "Services",
-    href: "#services",
-    megaMenu: {
-      columns: [
-        {
-          title: "Construction Materials",
-          links: [
-            "Cement & Concrete",
-            "Bricks & Blocks",
-            "Steel & TMT",
-            "Sand & Aggregates",
-            "Tiles & Flooring",
-          ],
-        },
-        {
-          title: "Equipment Rental",
-          links: [
-            "JCB & Excavators",
-            "Cranes & Hoists",
-            "Scaffolding",
-            "Concrete Mixers",
-            "Power Tools",
-          ],
-        },
-        {
-          title: "Professional Services",
-          links: [
-            "Contractors",
-            "Architects",
-            "Electricians",
-            "Plumbers",
-            "Interior Designers",
-          ],
-        },
-      ],
-    },
-  },
-  { label: "Contact", href: "#contact" },
-];
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -57,6 +15,8 @@ const Navbar = () => {
     typeof window !== "undefined" ? window.innerWidth : 0,
   );
   const [logoError, setLogoError] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userType, setUserType] = useState<string | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -72,6 +32,12 @@ const Navbar = () => {
         setMobileMenuOpen(null);
       }
     };
+
+    // Check login status from localStorage
+    const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    const type = localStorage.getItem('userType');
+    setIsLoggedIn(loggedIn);
+    setUserType(type);
 
     window.addEventListener("scroll", handleScroll);
     window.addEventListener("resize", handleResize);
@@ -105,6 +71,17 @@ const Navbar = () => {
     };
   }, [isOpen]);
 
+  const handleLogout = () => {
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('userType');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userEmail');
+    setIsLoggedIn(false);
+    setUserType(null);
+    navigate('/');
+  };
+
   const toggleMobileMenu = (label: string) => {
     setMobileMenuOpen(mobileMenuOpen === label ? null : label);
   };
@@ -129,13 +106,71 @@ const Navbar = () => {
       navigate(href);
       window.scrollTo(0, 0);
     }
-  };
-
-  // Perfect navigation to Member page
-  const handleMemberNavigation = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
     setIsOpen(false);
   };
+
+  const getDashboardLink = () => {
+    switch(userType) {
+      case 'seller': return '/seller/dashboard';
+      case 'contractor': return '/contractor/dashboard';
+      case 'rental': return '/rental/dashboard';
+      default: return '/login';
+    }
+  };
+
+  // Navigation links
+  const navLinks = [
+    {
+      label: "Services",
+      href: "#services",
+      icon: Package,
+      megaMenu: {
+        columns: [
+          {
+            title: "Construction Materials",
+            icon: Package,
+            links: [
+              { name: "Cement & Concrete", href: "/products/cement" },
+              { name: "Bricks & Blocks", href: "/products/bricks" },
+              { name: "Steel & TMT", href: "/products/steel" },
+              { name: "Sand & Aggregates", href: "/products/sand" },
+              { name: "Tiles & Flooring", href: "/products/tiles" },
+            ],
+          },
+          {
+            title: "Equipment Rental",
+            icon: Wrench,
+            links: [
+              { name: "JCB & Excavators", href: "/rentals?type=heavy" },
+              { name: "Cranes & Hoists", href: "/rentals?type=cranes" },
+              { name: "Scaffolding", href: "/rentals?type=scaffolding" },
+              { name: "Concrete Mixers", href: "/rentals?type=mixers" },
+              { name: "Power Tools", href: "/rentals?type=tools" },
+            ],
+          },
+          {
+            title: "Professional Services",
+            icon: User,
+            links: [
+              { name: "Contractors", href: "/contractors" },
+              { name: "Architects", href: "/contractors?type=architects" },
+              { name: "Electricians", href: "/contractors?type=electricians" },
+              { name: "Plumbers", href: "/contractors?type=plumbers" },
+              { name: "Interior Designers", href: "/contractors?type=interior" },
+            ],
+          },
+        ],
+      },
+    },
+    {
+      label: "Member",
+      href: "/member",
+    },
+    {
+      label: "Contact",
+      href: "#contact",
+    },
+  ];
 
   // Determine device type based on window width
   const isDesktop = windowWidth >= 1024;
@@ -170,20 +205,20 @@ const Navbar = () => {
                   <span className="text-[#502d13] font-bold text-sm sm:text-base md:text-xl">CT</span>
                 )}
               </motion.div>
-              <span className="text-lg sm:text-xl md:text-2xl font-bold text-[#e9ddc8] group-hover:text-white transition-colors">
+              <span className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-[#e9ddc8] group-hover:text-white transition-colors">
                 CASA TERMINAL
               </span>
             </Link>
 
             {/* Desktop Navigation - Hidden on mobile/tablet */}
-            <div className="hidden lg:flex items-center space-x-4 xl:space-x-8">
+            <div className="hidden lg:flex items-center space-x-2 xl:space-x-4">
               {navLinks.map((link) => (
                 <div
                   key={link.label}
                   className="relative"
                   onMouseEnter={() => {
-                    if (isDesktop) {
-                      link.megaMenu && setActiveMegaMenu(link.label);
+                    if (isDesktop && link.megaMenu) {
+                      setActiveMegaMenu(link.label);
                     }
                   }}
                   onMouseLeave={() => {
@@ -194,8 +229,14 @@ const Navbar = () => {
                 >
                   {link.megaMenu ? (
                     <button
-                      onClick={() => link.label === 'Services' && scrollToSection('services')}
-                      className="text-[#e9ddc8]/90 hover:text-white font-medium transition-colors relative group flex items-center gap-1 text-sm xl:text-base"
+                      onClick={() => {
+                        if (link.label === 'Services') {
+                          scrollToSection('services');
+                        } else if (link.label === 'Member') {
+                          navigate('/member');
+                        }
+                      }}
+                      className="text-[#e9ddc8]/90 hover:text-white font-medium transition-colors relative group flex items-center gap-1 text-sm xl:text-base px-2 xl:px-3 py-2"
                     >
                       {link.label}
                       <ChevronDown className={`w-3 h-3 xl:w-4 xl:h-4 transition-transform duration-300 ${
@@ -207,7 +248,7 @@ const Navbar = () => {
                     <a
                       href={link.href}
                       onClick={(e) => handleNavClick(e, link.href)}
-                      className="text-[#e9ddc8]/90 hover:text-white font-medium transition-colors relative group text-sm xl:text-base"
+                      className="text-[#e9ddc8]/90 hover:text-white font-medium transition-colors relative group text-sm xl:text-base px-2 xl:px-3 py-2"
                     >
                       {link.label}
                       <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#e9ddc8] transition-all group-hover:w-full"></span>
@@ -226,29 +267,36 @@ const Navbar = () => {
                           transition={{ duration: 0.2 }}
                           onMouseEnter={() => setActiveMegaMenu(link.label)}
                           onMouseLeave={() => setActiveMegaMenu(null)}
-                          className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[700px] xl:w-[650px] bg-[#502d13] rounded-lg shadow-xl border border-[#e9ddc8]/20 overflow-hidden"
+                          className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[600px] xl:w-[800px] bg-[#502d13] rounded-lg shadow-xl border border-[#e9ddc8]/20 overflow-hidden"
                         >
                           <div className="grid grid-cols-3 gap-4 xl:gap-6 p-4 xl:p-6">
-                            {link.megaMenu.columns.map((column, idx) => (
-                              <div key={idx}>
-                                <h4 className="font-semibold text-[#e9ddc8] mb-2 xl:mb-3 pb-1 xl:pb-2 border-b border-[#e9ddc8]/20 text-sm xl:text-base">
-                                  {column.title}
-                                </h4>
-                                <ul className="space-y-1 xl:space-y-2">
-                                  {column.links.map((item) => (
-                                    <li key={item}>
-                                      <a
-                                        href="#"
-                                        className="text-[#e9ddc8]/70 hover:text-white text-xs xl:text-sm transition-colors block hover:translate-x-1 transform duration-200"
-                                        onClick={() => setActiveMegaMenu(null)}
-                                      >
-                                        {item}
-                                      </a>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            ))}
+                            {link.megaMenu.columns.map((column, idx) => {
+                              const Icon = column.icon;
+                              return (
+                                <div key={idx}>
+                                  <h4 className="font-semibold text-[#e9ddc8] mb-2 xl:mb-3 pb-1 xl:pb-2 border-b border-[#e9ddc8]/20 text-sm xl:text-base flex items-center gap-2">
+                                    {Icon && <Icon className="w-4 h-4" />}
+                                    {column.title}
+                                  </h4>
+                                  <ul className="space-y-1 xl:space-y-2">
+                                    {column.links.map((item) => (
+                                      <li key={item.name}>
+                                        <Link
+                                          to={item.href}
+                                          className="text-[#e9ddc8]/70 hover:text-white text-xs xl:text-sm transition-colors block hover:translate-x-1 transform duration-200 py-1"
+                                          onClick={() => {
+                                            setActiveMegaMenu(null);
+                                            window.scrollTo(0, 0);
+                                          }}
+                                        >
+                                          {item.name}
+                                        </Link>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              );
+                            })}
                           </div>
                         </motion.div>
                       )}
@@ -269,27 +317,54 @@ const Navbar = () => {
                 <Search className="w-4 h-4 sm:w-5 sm:h-5" />
               </motion.button>
 
-              {/* User icon - hidden on very small screens */}
-              <motion.a
-                href="#"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="hidden min-[400px]:block p-1.5 sm:p-2 rounded-lg text-[#e9ddc8] hover:bg-[#e9ddc8]/10 transition-colors"
-                aria-label="User account"
-              >
-                <User className="w-4 h-4 sm:w-5 sm:h-5" />
-              </motion.a>
+              {/* User menu for logged in users */}
+              {isLoggedIn ? (
+                <Link
+                  to={getDashboardLink()}
+                  className="p-1.5 sm:p-2 rounded-lg text-[#e9ddc8] hover:bg-[#e9ddc8]/10 transition-colors flex items-center gap-2"
+                >
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 bg-[#e9ddc8] rounded-full flex items-center justify-center">
+                    <User className="w-3 h-3 sm:w-4 sm:h-4 text-[#502d13]" />
+                  </div>
+                  <span className="text-xs sm:text-sm capitalize hidden xl:inline">{userType}</span>
+                </Link>
+              ) : (
+                <>
+                  {/* User Icon - Opens Admin Login */}
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => navigate('/admin/login')}
+                    className="p-1.5 sm:p-2 rounded-lg text-[#e9ddc8] hover:bg-[#e9ddc8]/10 transition-colors relative group"
+                    aria-label="Admin Login"
+                  >
+                    <User className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <span className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-[#502d13] text-[#e9ddc8] text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                      Admin Login
+                    </span>
+                  </motion.button>
+                </>
+              )}
 
-              {/* Member button - perfectly routes to member page */}
-              <Link
-                to="/member"
-                onClick={handleMemberNavigation}
-                className="bg-[#e9ddc8] text-[#502d13] px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-lg font-semibold hover:bg-white transition-colors flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm md:text-base"
-              >
-                <LogIn className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
-                <span className="hidden min-[480px]:inline sm:hidden">Join as Member</span>
-                <span className="hidden sm:inline">Become a Member</span>
-              </Link>
+              {/* Login/Logout button */}
+              {isLoggedIn ? (
+                <button
+                  onClick={handleLogout}
+                  className="bg-[#e9ddc8] text-[#502d13] px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-lg font-semibold hover:bg-white transition-colors flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm md:text-base"
+                >
+                  <LogIn className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 rotate-180" />
+                  <span className="hidden min-[480px]:inline">Logout</span>
+                </button>
+              ) : (
+                <Link
+                  to="/login"
+                  onClick={() => setIsOpen(false)}
+                  className="bg-[#e9ddc8] text-[#502d13] px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-lg font-semibold hover:bg-white transition-colors flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm md:text-base"
+                >
+                  <LogIn className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+                  <span className="hidden min-[480px]:inline">Login</span>
+                </Link>
+              )}
 
               {/* Mobile Menu Button - visible on tablet and below */}
               <button
@@ -298,9 +373,9 @@ const Navbar = () => {
                 aria-label={isOpen ? "Close menu" : "Open menu"}
               >
                 {isOpen ? (
-                  <X className="w-5 h-10 sm:w-6 sm:h-6 text-[#e9ddc8]" />
+                  <X className="w-5 h-5 sm:w-6 sm:h-6 text-[#e9ddc8]" />
                 ) : (
-                  <Menu className="w-5 h-10 sm:w-6 sm:h-6 text-[#e9ddc8]" />
+                  <Menu className="w-5 h-5 sm:w-6 sm:h-6 text-[#e9ddc8]" />
                 )}
               </button>
             </div>
@@ -317,90 +392,142 @@ const Navbar = () => {
               transition={{ duration: 0.3 }}
               className="lg:hidden bg-[#502d13] border-t border-[#e9ddc8]/20 overflow-y-auto max-h-[calc(100vh-3.5rem)] sm:max-h-[calc(100vh-4rem)]"
             >
-              <div className="px-3 sm:px-4 py-4 sm:py-6 space-y-3 sm:space-y-4">
-                {navLinks.map((link) => (
-                  <div key={link.label} className="border-b border-[#e9ddc8]/10 last:border-0">
-                    {link.megaMenu ? (
-                      <>
-                        <button
-                          onClick={() => toggleMobileMenu(link.label)}
-                          className="w-full flex items-center justify-between py-2 sm:py-3 text-[#e9ddc8] font-medium text-sm sm:text-base"
-                        >
-                          <span>{link.label}</span>
-                          <ChevronDown
-                            className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 ${
-                              mobileMenuOpen === link.label ? "rotate-180" : ""
-                            }`}
-                          />
-                        </button>
+              <div className="px-3 sm:px-4 py-4 sm:py-6 space-y-2 sm:space-y-3">
+                {navLinks.map((link) => {
+                  const Icon = link.icon;
+                  return (
+                    <div key={link.label} className="border-b border-[#e9ddc8]/10 last:border-0">
+                      {link.megaMenu ? (
+                        <>
+                          <button
+                            onClick={() => {
+                              if (link.label === 'Services') {
+                                scrollToSection('services');
+                                setIsOpen(false);
+                              } else if (link.label === 'Member') {
+                                navigate('/member');
+                                setIsOpen(false);
+                              } else {
+                                toggleMobileMenu(link.label);
+                              }
+                            }}
+                            className="w-full flex items-center justify-between py-2 sm:py-3 text-[#e9ddc8] font-medium text-sm sm:text-base"
+                          >
+                            <span className="flex items-center gap-2">
+                              {Icon && <Icon className="w-4 h-4 sm:w-5 sm:h-5" />}
+                              {link.label}
+                            </span>
+                            {link.megaMenu && (
+                              <ChevronDown
+                                className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 ${
+                                  mobileMenuOpen === link.label ? "rotate-180" : ""
+                                }`}
+                              />
+                            )}
+                          </button>
 
-                        <AnimatePresence>
-                          {mobileMenuOpen === link.label && (
-                            <motion.div
-                              initial={{ opacity: 0, height: 0 }}
-                              animate={{ opacity: 1, height: "auto" }}
-                              exit={{ opacity: 0, height: 0 }}
-                              transition={{ duration: 0.3 }}
-                              className="overflow-hidden"
-                            >
-                              <div className="pb-3 sm:pb-4 space-y-3 sm:space-y-4">
-                                {link.megaMenu.columns.map((column, idx) => (
-                                  <div key={idx}>
-                                    <h4 className="text-[#ece3d4] text-lg sm:text-sm font-semibold mb-1 sm:mb-2 px-2">
-                                      {column.title}
-                                    </h4>
-                                    <ul className="space-y-1 sm:space-y-2">
-                                      {column.links.map((item) => (
-                                        <li key={item}>
-                                          <a
-                                            href="#"
-                                            className="block px-2 py-1.5 sm:py-2 text-[#e9ddc8]/80 hover:bg-[#e9ddc8]/10 rounded-lg transition-colors text-xs sm:text-sm"
-                                            onClick={() => setIsOpen(false)}
-                                          >
-                                            {item}
-                                          </a>
-                                        </li>
-                                      ))}
-                                    </ul>
-                                  </div>
-                                ))}
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </>
-                    ) : (
-                      <a
-                        href={link.href}
-                        onClick={(e) => {
-                          handleNavClick(e, link.href);
-                          setIsOpen(false);
-                        }}
-                        className="block py-2 sm:py-3 text-[#e9ddc8] font-medium hover:text-white transition-colors text-sm sm:text-base"
-                      >
-                        {link.label}
-                      </a>
-                    )}
-                  </div>
-                ))}
+                          <AnimatePresence>
+                            {mobileMenuOpen === link.label && (
+                              <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                exit={{ opacity: 0, height: 0 }}
+                                transition={{ duration: 0.3 }}
+                                className="overflow-hidden"
+                              >
+                                <div className="pb-3 sm:pb-4 space-y-3 sm:space-y-4">
+                                  {link.megaMenu.columns.map((column, idx) => {
+                                    const ColumnIcon = column.icon;
+                                    return (
+                                      <div key={idx}>
+                                        <h4 className="text-[#ece3d4] text-xs sm:text-sm font-semibold mb-1 sm:mb-2 px-2 flex items-center gap-2">
+                                          {ColumnIcon && <ColumnIcon className="w-3 h-3 sm:w-4 sm:h-4" />}
+                                          {column.title}
+                                        </h4>
+                                        <ul className="space-y-1 sm:space-y-2">
+                                          {column.links.map((item) => (
+                                            <li key={item.name}>
+                                              <Link
+                                                to={item.href}
+                                                className="block px-2 py-1.5 sm:py-2 text-[#e9ddc8]/80 hover:bg-[#e9ddc8]/10 rounded-lg transition-colors text-xs sm:text-sm"
+                                                onClick={() => {
+                                                  setIsOpen(false);
+                                                  window.scrollTo(0, 0);
+                                                }}
+                                              >
+                                                {item.name}
+                                              </Link>
+                                            </li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </>
+                      ) : (
+                        <a
+                          href={link.href}
+                          onClick={(e) => {
+                            handleNavClick(e, link.href);
+                            setIsOpen(false);
+                          }}
+                          className="flex items-center gap-2 py-2 sm:py-3 text-[#e9ddc8] font-medium hover:text-white transition-colors text-sm sm:text-base"
+                        >
+                          {Icon && <Icon className="w-4 h-4 sm:w-5 sm:h-5" />}
+                          {link.label}
+                        </a>
+                      )}
+                    </div>
+                  );
+                })}
 
                 {/* Mobile action buttons */}
                 <div className="pt-3 sm:pt-4 grid grid-cols-2 gap-2 sm:gap-3">
-                  <Link
-                    to="/member"
-                    onClick={handleMemberNavigation}
-                    className="bg-[#e9ddc8] text-[#502d13] px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-center hover:bg-white transition-colors flex items-center justify-center space-x-1 sm:space-x-2 text-xs sm:text-sm"
-                  >
-                    <LogIn className="w-3 h-3 sm:w-4 sm:h-4" />
-                    <span>Join</span>
-                  </Link>
-                  <Link
-                    to="/member"
-                    onClick={handleMemberNavigation}
-                    className="bg-transparent border border-[#e9ddc8]/30 text-[#e9ddc8] px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-center hover:bg-[#e9ddc8]/10 transition-colors text-xs sm:text-sm"
-                  >
-                    Sign In
-                  </Link>
+                  {isLoggedIn ? (
+                    <>
+                      <Link
+                        to={getDashboardLink()}
+                        onClick={() => setIsOpen(false)}
+                        className="bg-[#e9ddc8] text-[#502d13] px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-center hover:bg-white transition-colors flex items-center justify-center space-x-1 sm:space-x-2 text-xs sm:text-sm"
+                      >
+                        <User className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <span>Dashboard</span>
+                      </Link>
+                      <button
+                        onClick={() => {
+                          handleLogout();
+                          setIsOpen(false);
+                        }}
+                        className="bg-transparent border border-[#e9ddc8]/30 text-[#e9ddc8] px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-center hover:bg-[#e9ddc8]/10 transition-colors text-xs sm:text-sm flex items-center justify-center gap-1 sm:gap-2"
+                      >
+                        <LogIn className="w-3 h-3 sm:w-4 sm:h-4 rotate-180" />
+                        <span>Logout</span>
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        to="/login"
+                        onClick={() => setIsOpen(false)}
+                        className="bg-[#e9ddc8] text-[#502d13] px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-center hover:bg-white transition-colors flex items-center justify-center space-x-1 sm:space-x-2 text-xs sm:text-sm"
+                      >
+                        <LogIn className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <span>Login</span>
+                      </Link>
+                      <Link
+                        to="/admin/login"
+                        onClick={() => setIsOpen(false)}
+                        className="bg-transparent border border-[#e9ddc8]/30 text-[#e9ddc8] px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-center hover:bg-[#e9ddc8]/10 transition-colors text-xs sm:text-sm flex items-center justify-center gap-1 sm:gap-2"
+                      >
+                        <User className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <span>Admin</span>
+                      </Link>
+                    </>
+                  )}
                 </div>
               </div>
             </motion.div>
