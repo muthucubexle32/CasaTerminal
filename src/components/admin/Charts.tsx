@@ -14,25 +14,19 @@ const Charts = ({ type }: ChartsProps) => {
 
   useEffect(() => {
     if (!chartRef.current) return;
-
-    // Destroy existing chart
-    if (chartInstance.current) {
-      chartInstance.current.destroy();
-    }
+    if (chartInstance.current) chartInstance.current.destroy();
 
     const ctx = chartRef.current.getContext('2d');
     if (!ctx) return;
 
-    // Simple color scheme
     const colors = {
-      primary: '#f97316', // Orange
+      primary: '#f97316',
       secondary: '#fb923c',
       light: '#fed7aa',
       dark: '#c2410c'
     };
 
     if (type === 'revenue') {
-      // Revenue Chart - Line chart
       chartInstance.current = new Chart(ctx, {
         type: 'line',
         data: {
@@ -62,39 +56,23 @@ const Charts = ({ type }: ChartsProps) => {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: {
-              display: true,
-              position: 'top' as const,
-              labels: {
-                usePointStyle: true,
-                pointStyle: 'circle',
-                padding: 20,
-                font: { size: 12 }
-              }
-            },
+            legend: { display: true, position: 'top', labels: { usePointStyle: true, pointStyle: 'circle', padding: 20, font: { size: 12 } } },
             tooltip: {
               callbacks: {
                 label: (context) => {
-                  const label = context.dataset.label || '';
-                  const value = context.raw as number;
-                  return `${label}: ₹${value.toLocaleString('en-IN')}`;
+                  const value = context.raw as number; // cast to number
+                  return `${context.dataset.label}: ₹${value.toLocaleString('en-IN')}`;
                 }
               }
             }
           },
           scales: {
-            y: {
-              beginAtZero: true,
-              ticks: {
-                callback: (value) => '₹' + (Number(value) / 100000).toFixed(1) + 'L'
-              }
-            }
+            y: { beginAtZero: true, ticks: { callback: (value) => '₹' + (Number(value) / 100000).toFixed(1) + 'L' } }
           }
         }
       });
     } else {
-      // Category Chart - Doughnut chart
-   new Chart(ctx, {
+      chartInstance.current = new Chart(ctx, {
         type: 'doughnut',
         data: {
           labels: ['Construction Materials', 'Equipment Rental', 'Professional Services'],
@@ -110,16 +88,7 @@ const Charts = ({ type }: ChartsProps) => {
           maintainAspectRatio: false,
           cutout: '65%',
           plugins: {
-            legend: {
-              display: true,
-              position: 'bottom' as const,
-              labels: {
-                usePointStyle: true,
-                pointStyle: 'circle',
-                padding: 20,
-                font: { size: 12 }
-              }
-            },
+            legend: { display: true, position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 20, font: { size: 12 } } },
             tooltip: {
               callbacks: {
                 label: (context) => {
@@ -136,62 +105,30 @@ const Charts = ({ type }: ChartsProps) => {
       });
     }
 
-    return () => {
-      if (chartInstance.current) {
-        chartInstance.current.destroy();
-      }
-    };
+    return () => { if (chartInstance.current) chartInstance.current.destroy(); };
   }, [type]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden"
-    >
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
+      className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
       <div className="p-4 sm:p-5">
-        {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <div className="p-2 bg-orange-100 rounded-lg">
-              {type === 'revenue' ? (
-                <TrendingUp className="w-4 h-4 text-orange-600" />
-              ) : (
-                <PieChart className="w-4 h-4 text-orange-600" />
-              )}
+              {type === 'revenue' ? <TrendingUp className="w-4 h-4 text-orange-600" /> : <PieChart className="w-4 h-4 text-orange-600" />}
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-gray-800">
-                {type === 'revenue' ? 'Revenue Overview' : 'Category Sales'}
-              </h3>
-              <p className="text-xs text-gray-500">
-                {type === 'revenue' ? 'Monthly comparison' : 'Distribution by category'}
-              </p>
+              <h3 className="text-sm font-semibold text-gray-800">{type === 'revenue' ? 'Revenue Overview' : 'Category Sales'}</h3>
+              <p className="text-xs text-gray-500">{type === 'revenue' ? 'Monthly comparison' : 'Distribution by category'}</p>
             </div>
           </div>
         </div>
-
-        {/* Chart */}
-        <div className="h-64 sm:h-72">
-          <canvas ref={chartRef}></canvas>
-        </div>
-
-        {/* Footer Stats */}
+        <div className="h-64 sm:h-72"><canvas ref={chartRef}></canvas></div>
         {type === 'revenue' && (
           <div className="mt-4 pt-3 border-t border-gray-100 grid grid-cols-3 gap-2 text-center">
-            <div>
-              <p className="text-xs text-gray-500">Total</p>
-              <p className="text-sm font-semibold text-gray-800">₹45.6L</p>
-            </div>
-            <div>
-              <p className="text-xs text-gray-500">Growth</p>
-              <p className="text-sm font-semibold text-green-600">+15.8%</p>
-            </div>
-            <div>
-              <p className="text-xs text-gray-500">Avg</p>
-              <p className="text-sm font-semibold text-gray-800">₹4.2L</p>
-            </div>
+            <div><p className="text-xs text-gray-500">Total</p><p className="text-sm font-semibold text-gray-800">₹45.6L</p></div>
+            <div><p className="text-xs text-gray-500">Growth</p><p className="text-sm font-semibold text-green-600">+15.8%</p></div>
+            <div><p className="text-xs text-gray-500">Avg</p><p className="text-sm font-semibold text-gray-800">₹4.2L</p></div>
           </div>
         )}
       </div>

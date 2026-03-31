@@ -12,13 +12,13 @@ import {
   Hammer,
   Star,
   Clock,
- 
   Award,
   Users,
   Briefcase
 } from 'lucide-react';
 
 const ContractorSection = () => {
+  const navigate = useNavigate();
   const [showLogin, setShowLogin] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loginData, setLoginData] = useState({
@@ -26,21 +26,24 @@ const ContractorSection = () => {
     password: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const navigate = useNavigate();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: Record<string, string> = {};
 
-    if (!loginData.contractorId) {
+    if (!loginData.contractorId.trim()) {
       newErrors.contractorId = 'Contractor ID is required';
     }
-    if (!loginData.password) {
+    if (!loginData.password.trim()) {
       newErrors.password = 'Password is required';
     }
 
     if (Object.keys(newErrors).length === 0) {
-      console.log('Login attempt:', loginData);
+      // Set session
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('userType', 'contractor');
+      localStorage.setItem('userName', loginData.contractorId.split('@')[0] || loginData.contractorId);
+      localStorage.setItem('userEmail', loginData.contractorId);
       navigate('/contractor/dashboard');
     } else {
       setErrors(newErrors);
@@ -161,7 +164,7 @@ const ContractorSection = () => {
               >
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Contractor ID
+                    Contractor ID / Email
                   </label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -175,7 +178,7 @@ const ContractorSection = () => {
                       className={`w-full pl-10 pr-4 py-2.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 ${
                         errors.contractorId ? 'border-red-500' : 'border-gray-200'
                       }`}
-                      placeholder="Enter your contractor ID"
+                      placeholder="Enter your contractor ID or email"
                     />
                   </div>
                   {errors.contractorId && (

@@ -204,14 +204,6 @@ const HeroSection = () => {
             transition={{ duration: 1 }}
             className={`text-center ${dimensions.width >= 1024 ? 'lg:text-left' : ''}`}
           >
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className={`${getTitleClasses()} font-display font-bold text-[#e9ddc8] leading-tight`}
-            >
-              India's
-            </motion.div>
             
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -219,7 +211,7 @@ const HeroSection = () => {
               transition={{ duration: 0.8, delay: 0.5 }}
               className={`${getTitleClasses()} font-display font-bold text-[#e9ddc8] leading-tight`}
             >
-              Construction
+              The Construction
             </motion.div>
             
             <motion.div

@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 
 const SellerSection = () => {
+  const navigate = useNavigate();
   const [showLogin, setShowLogin] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loginData, setLoginData] = useState({
@@ -24,21 +25,24 @@ const SellerSection = () => {
     password: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const navigate = useNavigate();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: Record<string, string> = {};
 
-    if (!loginData.sellerId) {
+    if (!loginData.sellerId.trim()) {
       newErrors.sellerId = 'Seller ID is required';
     }
-    if (!loginData.password) {
+    if (!loginData.password.trim()) {
       newErrors.password = 'Password is required';
     }
 
     if (Object.keys(newErrors).length === 0) {
-      console.log('Login attempt:', loginData);
+      // Set session
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('userType', 'seller');
+      localStorage.setItem('userName', loginData.sellerId.split('@')[0] || loginData.sellerId);
+      localStorage.setItem('userEmail', loginData.sellerId);
       navigate('/seller/dashboard');
     } else {
       setErrors(newErrors);
@@ -74,7 +78,7 @@ const SellerSection = () => {
       </div>
 
       <div className="p-4 sm:p-6 md:p-8">
-        {/* Stats Grid - Responsive */}
+        {/* Stats Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-6 sm:mb-8">
           {stats.map((stat, index) => (
             <div key={index} className="bg-primary-50 rounded-lg p-2 sm:p-3 text-center">
@@ -158,7 +162,7 @@ const SellerSection = () => {
               >
                 <div>
                   <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                    Seller ID
+                    Seller ID / Email
                   </label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />
@@ -172,7 +176,7 @@ const SellerSection = () => {
                       className={`w-full pl-8 sm:pl-9 pr-3 py-2 sm:py-2.5 text-xs sm:text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 transition-all ${
                         errors.sellerId ? 'border-red-500 bg-red-50' : 'border-gray-300'
                       }`}
-                      placeholder="Enter your seller ID"
+                      placeholder="Enter your seller ID or email"
                     />
                   </div>
                   {errors.sellerId && (

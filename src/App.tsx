@@ -1,3 +1,4 @@
+// src/App.tsx
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { Toaster } from 'react-hot-toast';
@@ -6,6 +7,7 @@ import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import LandingPage from './pages/LandingPage';
 import MemberPage from './pages/MemberPage';
+import ProductsPage from './pages/ProductsPage';
 
 // Auth Pages
 import AdminLoginPage from './pages/auth/AdminLoginPage';
@@ -97,6 +99,14 @@ function App() {
 
           {/* Public Listings (with Layout) */}
           <Route
+            path="/products"
+            element={
+              <Layout>
+                <ProductsPage />
+              </Layout>
+            }
+          />
+          <Route
             path="/contractors"
             element={
               <Layout>
@@ -129,6 +139,32 @@ function App() {
             }
           />
 
+          {/* Public Registration Routes (no authentication required) */}
+          <Route
+            path="/seller/register"
+            element={
+              <Layout>
+                <SellerRegistration />
+              </Layout>
+            }
+          />
+          <Route
+            path="/contractor/register"
+            element={
+              <Layout>
+                <ContractorRegistration />
+              </Layout>
+            }
+          />
+          <Route
+            path="/rental/register"
+            element={
+              <Layout>
+                <RentalRegistration />
+              </Layout>
+            }
+          />
+
           {/* Protected Admin Routes */}
           <Route element={<ProtectedRoute allowedTypes={['admin']} />}>
             <Route element={<AdminLayout />}>
@@ -143,17 +179,8 @@ function App() {
             </Route>
           </Route>
 
-          {/* Protected User Routes (with Layout) */}
+          {/* Protected User Routes (only dashboards) */}
           <Route element={<ProtectedRoute allowedTypes={['seller', 'contractor', 'rental', 'customer']} />}>
-            {/* Seller Routes */}
-            <Route
-              path="/seller/register"
-              element={
-                <Layout>
-                  <SellerRegistration />
-                </Layout>
-              }
-            />
             <Route
               path="/seller/dashboard"
               element={
@@ -162,31 +189,11 @@ function App() {
                 </Layout>
               }
             />
-
-            {/* Contractor Routes */}
-            <Route
-              path="/contractor/register"
-              element={
-                <Layout>
-                  <ContractorRegistration />
-                </Layout>
-              }
-            />
             <Route
               path="/contractor/dashboard"
               element={
                 <Layout>
                   <ContractorDashboard />
-                </Layout>
-              }
-            />
-
-            {/* Rental Routes */}
-            <Route
-              path="/rental/register"
-              element={
-                <Layout>
-                  <RentalRegistration />
                 </Layout>
               }
             />

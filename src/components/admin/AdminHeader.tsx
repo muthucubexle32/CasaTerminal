@@ -3,19 +3,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Menu,
-  Search,
-  Bell,
-  User,
-  Settings,
-  LogOut,
-  ChevronDown,
-  Shield,
-  HardHat,
-  Clock,
-  Sun,
-  Moon,
-  X
+  Menu, Search, Bell, User, Settings, LogOut, ChevronDown,
+  Shield, HardHat, Clock, Sun, Moon, X
 } from 'lucide-react';
 
 interface AdminHeaderProps {
@@ -32,15 +21,11 @@ const AdminHeader = ({ sidebarOpen, setSidebarOpen }: AdminHeaderProps) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Update time every second
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  // Simplified notifications
   const notifications = [
     { id: 1, title: 'New seller registration', time: '5 min ago', type: 'success' },
     { id: 2, title: 'Payment pending', time: '1 hour ago', type: 'warning' },
@@ -55,42 +40,21 @@ const AdminHeader = ({ sidebarOpen, setSidebarOpen }: AdminHeaderProps) => {
     }
   };
 
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
-      minute: '2-digit',
-      hour12: true 
-    });
-  };
-
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'short',
-      month: 'short', 
-      day: 'numeric'
-    });
-  };
-
-  // Get notification styles
+  const formatTime = (date: Date) => date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+  const formatDate = (date: Date) => date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
 
   return (
     <header className="fixed top-0 right-0 left-0 bg-white shadow-sm z-30 h-16 border-b">
-      {/* Top accent bar */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-orange-500"></div>
-      
+      <div className="absolute top-0 left-0 right-0 h-1 bg-orange-500" />
       <div className="flex items-center justify-between h-full px-3 sm:px-4 lg:px-6">
-        {/* Left Section */}
+        {/* Left */}
         <div className="flex items-center gap-2 sm:gap-4">
-          {/* Mobile Menu Button */}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            aria-label="Toggle menu"
           >
             <Menu className="w-5 h-5 text-gray-600" />
           </button>
-          
-          {/* Logo - Hidden on mobile */}
           <div className="hidden sm:flex items-center gap-2">
             <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
               <HardHat className="w-5 h-5 text-white" />
@@ -100,8 +64,6 @@ const AdminHeader = ({ sidebarOpen, setSidebarOpen }: AdminHeaderProps) => {
               <p className="text-[10px] text-gray-500">Admin Panel</p>
             </div>
           </div>
-
-          {/* Time - Hidden on mobile */}
           <div className="hidden md:flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full text-sm">
             <Clock className="w-4 h-4 text-orange-500" />
             <span className="text-gray-600">{formatTime(currentTime)}</span>
@@ -110,9 +72,9 @@ const AdminHeader = ({ sidebarOpen, setSidebarOpen }: AdminHeaderProps) => {
           </div>
         </div>
 
-        {/* Right Section */}
+        {/* Right */}
         <div className="flex items-center gap-1 sm:gap-2">
-          {/* Search - Desktop */}
+          {/* Desktop Search */}
           <div className="hidden md:flex items-center bg-gray-100 rounded-lg px-3 py-2 w-64 lg:w-80">
             <Search className="w-4 h-4 text-gray-400 mr-2" />
             <input
@@ -123,12 +85,7 @@ const AdminHeader = ({ sidebarOpen, setSidebarOpen }: AdminHeaderProps) => {
               className="bg-transparent border-none outline-none text-sm w-full"
             />
           </div>
-
-          {/* Search - Mobile */}
-          <button 
-            onClick={() => setShowSearch(true)}
-            className="md:hidden p-2 hover:bg-gray-100 rounded-lg"
-          >
+          <button onClick={() => setShowSearch(true)} className="md:hidden p-2 hover:bg-gray-100 rounded-lg">
             <Search className="w-5 h-5 text-gray-600" />
           </button>
 
@@ -136,13 +93,8 @@ const AdminHeader = ({ sidebarOpen, setSidebarOpen }: AdminHeaderProps) => {
           <button
             onClick={() => setIsDarkMode(!isDarkMode)}
             className="p-2 hover:bg-gray-100 rounded-lg hidden sm:block"
-            title={isDarkMode ? 'Light mode' : 'Dark mode'}
           >
-            {isDarkMode ? (
-              <Sun className="w-5 h-5 text-yellow-500" />
-            ) : (
-              <Moon className="w-5 h-5 text-gray-600" />
-            )}
+            {isDarkMode ? <Sun className="w-5 h-5 text-yellow-500" /> : <Moon className="w-5 h-5 text-gray-600" />}
           </button>
 
           {/* Notifications */}
@@ -152,9 +104,8 @@ const AdminHeader = ({ sidebarOpen, setSidebarOpen }: AdminHeaderProps) => {
               className="p-2 hover:bg-gray-100 rounded-lg relative"
             >
               <Bell className="w-5 h-5 text-gray-600" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
             </button>
-
             <AnimatePresence>
               {showNotifications && (
                 <motion.div
@@ -184,7 +135,7 @@ const AdminHeader = ({ sidebarOpen, setSidebarOpen }: AdminHeaderProps) => {
             </AnimatePresence>
           </div>
 
-          {/* Profile Menu */}
+          {/* Profile */}
           <div className="relative">
             <button
               onClick={() => setShowProfileMenu(!showProfileMenu)}
@@ -194,7 +145,7 @@ const AdminHeader = ({ sidebarOpen, setSidebarOpen }: AdminHeaderProps) => {
                 <div className="w-8 h-8 sm:w-9 sm:h-9 bg-orange-500 rounded-full flex items-center justify-center">
                   <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                 </div>
-                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></div>
+                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full" />
               </div>
               <div className="hidden sm:block text-left">
                 <p className="text-sm font-medium text-gray-800">Admin</p>
@@ -202,7 +153,6 @@ const AdminHeader = ({ sidebarOpen, setSidebarOpen }: AdminHeaderProps) => {
               </div>
               <ChevronDown className="w-4 h-4 text-gray-400 hidden sm:block" />
             </button>
-
             <AnimatePresence>
               {showProfileMenu && (
                 <motion.div
@@ -222,7 +172,7 @@ const AdminHeader = ({ sidebarOpen, setSidebarOpen }: AdminHeaderProps) => {
                     <button className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-100 rounded-lg">
                       <Settings className="w-4 h-4" /> Settings
                     </button>
-                    <div className="border-t my-2"></div>
+                    <div className="border-t my-2" />
                     <button
                       onClick={handleLogout}
                       className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg"
@@ -266,10 +216,7 @@ const AdminHeader = ({ sidebarOpen, setSidebarOpen }: AdminHeaderProps) => {
                     autoFocus
                   />
                 </div>
-                <button
-                  onClick={() => setShowSearch(false)}
-                  className="p-2 hover:bg-gray-100 rounded-lg"
-                >
+                <button onClick={() => setShowSearch(false)} className="p-2 hover:bg-gray-100 rounded-lg">
                   <X className="w-5 h-5" />
                 </button>
               </div>

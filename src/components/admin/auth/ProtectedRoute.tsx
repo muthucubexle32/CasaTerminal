@@ -1,4 +1,3 @@
-// src/components/auth/ProtectedRoute.tsx
 import { Navigate, Outlet } from 'react-router-dom';
 
 interface ProtectedRouteProps {
@@ -6,18 +5,17 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ allowedTypes }: ProtectedRouteProps) => {
-  // Check if user is logged in
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
   const userType = localStorage.getItem('userType');
 
-  // If not logged in, redirect to login page
+  // Not logged in → redirect to user login page
   if (!isLoggedIn) {
     return <Navigate to="/login" replace />;
   }
 
-  // If allowedTypes is specified and user type is not in the allowed list
+  // If specific types are required and user type is not allowed
   if (allowedTypes && !allowedTypes.includes(userType || '')) {
-    // Redirect to appropriate dashboard based on user type
+    // Redirect based on user type
     switch(userType) {
       case 'seller':
         return <Navigate to="/seller/dashboard" replace />;
@@ -32,7 +30,7 @@ const ProtectedRoute = ({ allowedTypes }: ProtectedRouteProps) => {
     }
   }
 
-  // If authorized, render the child routes
+  // Authorized → render child routes
   return <Outlet />;
 };
 

@@ -1,8 +1,8 @@
 // src/components/layout/Navbar.tsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ChevronDown, Search, User, LogIn, Package, Wrench,  } from 'lucide-react';
+import { Menu, X, ChevronDown, Search, User, LogIn, Package, Wrench, LogOut } from 'lucide-react';
 import logo from "/logo.png";
 
 const Navbar = () => {
@@ -17,13 +17,23 @@ const Navbar = () => {
   const [logoError, setLogoError] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userType, setUserType] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string>('');
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const profileDropdownRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Helper to detect if device is likely touch‑capable
+  const isTouchDevice = useRef(
+    typeof window !== 'undefined' &&
+    ('ontouchstart' in window || navigator.maxTouchPoints > 0)
+  ).current;
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
-      setActiveMegaMenu(null);
+      // Close mega menu on scroll
+      if (activeMegaMenu) setActiveMegaMenu(null);
     };
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
@@ -33,20 +43,30 @@ const Navbar = () => {
       }
     };
 
-    // Check login status from localStorage
+    // Check login status
     const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
     const type = localStorage.getItem('userType');
+    const name = localStorage.getItem('userName') || '';
     setIsLoggedIn(loggedIn);
     setUserType(type);
+    setUserName(name);
 
     window.addEventListener("scroll", handleScroll);
     window.addEventListener("resize", handleResize);
 
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target as Node)) {
+        setProfileDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+
     return () => {
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", handleResize);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, [activeMegaMenu]);
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -54,6 +74,7 @@ const Navbar = () => {
         setIsOpen(false);
         setShowSearch(false);
         setActiveMegaMenu(null);
+        setProfileDropdownOpen(false);
       }
     };
     window.addEventListener("keydown", handleEsc);
@@ -79,6 +100,8 @@ const Navbar = () => {
     localStorage.removeItem('userEmail');
     setIsLoggedIn(false);
     setUserType(null);
+    setUserName('');
+    setProfileDropdownOpen(false);
     navigate('/');
   };
 
@@ -114,7 +137,7 @@ const Navbar = () => {
       case 'seller': return '/seller/dashboard';
       case 'contractor': return '/contractor/dashboard';
       case 'rental': return '/rental/dashboard';
-      default: return '/login';
+      default: return '/member';
     }
   };
 
@@ -165,15 +188,27 @@ const Navbar = () => {
     {
       label: "Member",
       href: "/member",
+      icon: User,
     },
     {
       label: "Contact",
       href: "#contact",
+      icon: null,
     },
   ];
 
-  // Determine device type based on window width
   const isDesktop = windowWidth >= 1024;
+
+  // Toggle mega menu on click (for touch devices and as an alternative for mouse)
+  const handleMegaMenuToggle = (label: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isTouchDevice || !isDesktop) {
+      setActiveMegaMenu(activeMegaMenu === label ? null : label);
+    } else {
+      // For mouse on desktop, we keep hover – but if user clicks, close it
+      setActiveMegaMenu(null);
+    }
+  };
 
   return (
     <>
@@ -187,8 +222,8 @@ const Navbar = () => {
       >
         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
           <div className="flex justify-between items-center h-14 sm:h-16 md:h-20">
-            {/* Logo - Responsive sizing */}
-            <Link to="/" onClick={() => window.scrollTo(0, 0)} className="flex items-center space-x-1 sm:space-x-2 group">
+            {/* Logo */}
+            <Link to="/" onClick={() => window.scrollTo(0, 0)} className="flex items-center space-x-1 sm:space-x-2 group shrink-0">
               <motion.div
                 whileHover={{ rotate: 360 }}
                 transition={{ duration: 0.5 }}
@@ -205,38 +240,42 @@ const Navbar = () => {
                   <span className="text-[#502d13] font-bold text-sm sm:text-base md:text-xl">CT</span>
                 )}
               </motion.div>
-              <span className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-[#e9ddc8] group-hover:text-white transition-colors">
+              <span className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-[#e9ddc8] group-hover:text-white transition-colors truncate">
                 CASA TERMINAL
               </span>
             </Link>
 
-            {/* Desktop Navigation - Hidden on mobile/tablet */}
-            <div className="hidden lg:flex items-center space-x-2 xl:space-x-4">
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center space-x-1 xl:space-x-2">
               {navLinks.map((link) => (
                 <div
                   key={link.label}
                   className="relative"
                   onMouseEnter={() => {
-                    if (isDesktop && link.megaMenu) {
+                    // Only open mega menu on hover if it's a desktop mouse device
+                    if (!isTouchDevice && isDesktop && link.megaMenu) {
                       setActiveMegaMenu(link.label);
                     }
                   }}
                   onMouseLeave={() => {
-                    if (isDesktop) {
+                    if (!isTouchDevice && isDesktop) {
                       setActiveMegaMenu(null);
                     }
                   }}
                 >
                   {link.megaMenu ? (
                     <button
-                      onClick={() => {
-                        if (link.label === 'Services') {
+                      onClick={(e) => {
+                        // For touch devices or if we want to allow click toggling
+                        if (isTouchDevice || !isDesktop) {
+                          handleMegaMenuToggle(link.label, e);
+                        } else {
+                          // For mouse desktop: click can be used to go to services section
                           scrollToSection('services');
-                        } else if (link.label === 'Member') {
-                          navigate('/member');
                         }
                       }}
                       className="text-[#e9ddc8]/90 hover:text-white font-medium transition-colors relative group flex items-center gap-1 text-sm xl:text-base px-2 xl:px-3 py-2"
+                      aria-expanded={activeMegaMenu === link.label}
                     >
                       {link.label}
                       <ChevronDown className={`w-3 h-3 xl:w-4 xl:h-4 transition-transform duration-300 ${
@@ -255,7 +294,7 @@ const Navbar = () => {
                     </a>
                   )}
 
-                  {/* Mega Menu - Desktop only */}
+                  {/* Mega Menu */}
                   <AnimatePresence>
                     {link.megaMenu &&
                       activeMegaMenu === link.label &&
@@ -265,11 +304,9 @@ const Navbar = () => {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 10 }}
                           transition={{ duration: 0.2 }}
-                          onMouseEnter={() => setActiveMegaMenu(link.label)}
-                          onMouseLeave={() => setActiveMegaMenu(null)}
-                          className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[600px] xl:w-[800px] bg-[#502d13] rounded-lg shadow-xl border border-[#e9ddc8]/20 overflow-hidden"
+                          className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-screen max-w-[700px] sm:max-w-[600px] xl:max-w-[700px] bg-[#502d13] rounded-lg shadow-xl border border-[#e9ddc8]/20 overflow-hidden"
                         >
-                          <div className="grid grid-cols-3 gap-4 xl:gap-6 p-4 xl:p-6">
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 xl:p-6">
                             {link.megaMenu.columns.map((column, idx) => {
                               const Icon = column.icon;
                               return (
@@ -305,7 +342,7 @@ const Navbar = () => {
               ))}
             </div>
 
-            {/* Action Icons - Responsive */}
+            {/* Action Icons */}
             <div className="flex items-center space-x-1 sm:space-x-2">
               <motion.button
                 whileHover={{ scale: 1.1 }}
@@ -317,42 +354,75 @@ const Navbar = () => {
                 <Search className="w-4 h-4 sm:w-5 sm:h-5" />
               </motion.button>
 
-              {/* User menu for logged in users */}
-              {isLoggedIn ? (
-                <Link
-                  to={getDashboardLink()}
-                  className="p-1.5 sm:p-2 rounded-lg text-[#e9ddc8] hover:bg-[#e9ddc8]/10 transition-colors flex items-center gap-2"
+              {/* Profile Dropdown */}
+              <div className="relative" ref={profileDropdownRef}>
+                <button
+                  onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                  className="p-1.5 sm:p-2 rounded-lg text-[#e9ddc8] hover:bg-[#e9ddc8]/10 transition-colors flex items-center justify-center"
+                  aria-label="Profile"
                 >
                   <div className="w-6 h-6 sm:w-7 sm:h-7 bg-[#e9ddc8] rounded-full flex items-center justify-center">
                     <User className="w-3 h-3 sm:w-4 sm:h-4 text-[#502d13]" />
                   </div>
-                  <span className="text-xs sm:text-sm capitalize hidden xl:inline">{userType}</span>
-                </Link>
-              ) : (
-                <>
-                  {/* User Icon - Opens Admin Login */}
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => navigate('/admin/login')}
-                    className="p-1.5 sm:p-2 rounded-lg text-[#e9ddc8] hover:bg-[#e9ddc8]/10 transition-colors relative group"
-                    aria-label="Admin Login"
-                  >
-                    <User className="w-4 h-4 sm:w-5 sm:h-5" />
-                    <span className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-[#502d13] text-[#e9ddc8] text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                      Admin Login
-                    </span>
-                  </motion.button>
-                </>
-              )}
+                </button>
 
-              {/* Login/Logout button */}
+                <AnimatePresence>
+                  {profileDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50"
+                    >
+                      {isLoggedIn ? (
+                        <>
+                          <div className="p-3 border-b bg-gray-50">
+                            <p className="font-medium text-gray-800 truncate">{userName || 'User'}</p>
+                            <p className="text-xs text-gray-500 capitalize">{userType}</p>
+                          </div>
+                          <div className="p-2">
+                            <Link
+                              to={getDashboardLink()}
+                              onClick={() => setProfileDropdownOpen(false)}
+                              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
+                            >
+                              <User className="w-4 h-4" />
+                              Dashboard
+                            </Link>
+                            <button
+                              onClick={handleLogout}
+                              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg"
+                            >
+                              <LogOut className="w-4 h-4" />
+                              Logout
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="p-2">
+                          <Link
+                            to="/login"
+                            onClick={() => setProfileDropdownOpen(false)}
+                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
+                          >
+                            <LogIn className="w-4 h-4" />
+                            User Login
+                          </Link>
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Login/Logout Button */}
               {isLoggedIn ? (
                 <button
                   onClick={handleLogout}
                   className="bg-[#e9ddc8] text-[#502d13] px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-lg font-semibold hover:bg-white transition-colors flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm md:text-base"
                 >
-                  <LogIn className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 rotate-180" />
+                  <LogOut className="w-3 h-3 sm:w-4 sm:h-4 rotate-180" />
                   <span className="hidden min-[480px]:inline">Logout</span>
                 </button>
               ) : (
@@ -361,12 +431,12 @@ const Navbar = () => {
                   onClick={() => setIsOpen(false)}
                   className="bg-[#e9ddc8] text-[#502d13] px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-lg font-semibold hover:bg-white transition-colors flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm md:text-base"
                 >
-                  <LogIn className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+                  <LogIn className="w-3 h-3 sm:w-4 sm:h-4 md:w-3 md:h-3" />
                   <span className="hidden min-[480px]:inline">Login</span>
                 </Link>
               )}
 
-              {/* Mobile Menu Button - visible on tablet and below */}
+              {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="lg:hidden p-1.5 sm:p-2 rounded-lg hover:bg-[#e9ddc8]/10 transition-colors"
@@ -382,7 +452,7 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile/Tablet Menu - Responsive */}
+        {/* Mobile Menu */}
         <AnimatePresence>
           {isOpen && (
             <motion.div
@@ -402,8 +472,8 @@ const Navbar = () => {
                           <button
                             onClick={() => {
                               if (link.label === 'Services') {
-                                scrollToSection('services');
-                                setIsOpen(false);
+                                // For mobile, we want to open the accordion, not scroll
+                                toggleMobileMenu(link.label);
                               } else if (link.label === 'Member') {
                                 navigate('/member');
                                 setIsOpen(false);
@@ -504,7 +574,7 @@ const Navbar = () => {
                         }}
                         className="bg-transparent border border-[#e9ddc8]/30 text-[#e9ddc8] px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-center hover:bg-[#e9ddc8]/10 transition-colors text-xs sm:text-sm flex items-center justify-center gap-1 sm:gap-2"
                       >
-                        <LogIn className="w-3 h-3 sm:w-4 sm:h-4 rotate-180" />
+                        <LogOut className="w-3 h-3 sm:w-4 sm:h-4 rotate-180" />
                         <span>Logout</span>
                       </button>
                     </>
@@ -513,18 +583,10 @@ const Navbar = () => {
                       <Link
                         to="/login"
                         onClick={() => setIsOpen(false)}
-                        className="bg-[#e9ddc8] text-[#502d13] px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-center hover:bg-white transition-colors flex items-center justify-center space-x-1 sm:space-x-2 text-xs sm:text-sm"
+                        className="bg-[#e9ddc8] text-[#502d13] px-3 sm:px- py-2 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-center hover:bg-white transition-colors flex items-center justify-center space-x-1 sm:space-x-2 text-xs sm:text-sm"
                       >
                         <LogIn className="w-3 h-3 sm:w-4 sm:h-4" />
-                        <span>Login</span>
-                      </Link>
-                      <Link
-                        to="/admin/login"
-                        onClick={() => setIsOpen(false)}
-                        className="bg-transparent border border-[#e9ddc8]/30 text-[#e9ddc8] px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-center hover:bg-[#e9ddc8]/10 transition-colors text-xs sm:text-sm flex items-center justify-center gap-1 sm:gap-2"
-                      >
-                        <User className="w-3 h-3 sm:w-4 sm:h-4" />
-                        <span>Admin</span>
+                        <span>User Login</span>
                       </Link>
                     </>
                   )}
@@ -535,7 +597,7 @@ const Navbar = () => {
         </AnimatePresence>
       </motion.nav>
 
-      {/* Search Modal - Responsive */}
+      {/* Search Modal */}
       <AnimatePresence>
         {showSearch && (
           <motion.div

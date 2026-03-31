@@ -3,7 +3,40 @@ import { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import AdminSidebar from './AdminSidebar';
-import { HardHat, Wrench,CheckCircle } from 'lucide-react';
+import AdminHeader from './AdminHeader';
+import { HardHat, Wrench, CheckCircle } from 'lucide-react';
+
+// Simple error boundary
+import { Component, ErrorInfo, ReactNode } from 'react';
+class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error?: Error }> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('AdminLayout error:', error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="p-8 bg-red-50 text-red-600 rounded-lg">
+          <h2 className="text-lg font-bold">Something went wrong</h2>
+          <pre className="mt-2 text-sm">{this.state.error?.message}</pre>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+          >
+            Reload Page
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -17,25 +50,25 @@ const AdminLayout = () => {
     // Check authentication
     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
     const userType = localStorage.getItem('userType');
-    
+    const currentPath = location.pathname;
+
     if (!isLoggedIn || userType !== 'admin') {
-      navigate('/admin/login');
-    } else {
-      setIsLoading(false);
-      
-      // Show welcome message only once per session
-      const hasSeenWelcome = sessionStorage.getItem('hasSeenWelcome');
-      if (!hasSeenWelcome) {
-        setShowWelcome(true);
-        sessionStorage.setItem('hasSeenWelcome', 'true');
-        
-        // Auto-hide welcome message after 5 seconds
-        setTimeout(() => {
-          setShowWelcome(false);
-        }, 5000);
+      if (currentPath !== '/admin/login') {
+        navigate('/admin/login');
       }
+      return;
     }
-  }, [navigate]);
+
+    setIsLoading(false);
+
+    // Show welcome message only once per session
+    const hasSeenWelcome = sessionStorage.getItem('hasSeenWelcome');
+    if (!hasSeenWelcome) {
+      setShowWelcome(true);
+      sessionStorage.setItem('hasSeenWelcome', 'true');
+      setTimeout(() => setShowWelcome(false), 5000);
+    }
+  }, [navigate, location]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -43,13 +76,11 @@ const AdminLayout = () => {
       setIsMobile(mobile);
       setSidebarOpen(!mobile);
     };
-
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Get page title from path
   const getPageTitle = () => {
     const path = location.pathname;
     if (path.includes('dashboard')) return 'Dashboard';
@@ -72,7 +103,7 @@ const AdminLayout = () => {
               animate={{ rotate: 360 }}
               transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
               className="w-24 h-24 border-4 border-[#e9ddc8] border-t-transparent rounded-full"
-            ></motion.div>
+            />
             <motion.div
               animate={{ scale: [1, 1.2, 1] }}
               transition={{ duration: 1, repeat: Infinity }}
@@ -125,10 +156,9 @@ const AdminLayout = () => {
         )}
       </AnimatePresence>
 
-      {/* Sidebar */}
       <AdminSidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} isMobile={isMobile} />
-      
-      {/* Main Content */}
+      <AdminHeader sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+
       <div className={`transition-all duration-300 ${sidebarOpen ? 'lg:ml-80' : ''}`}>
         {/* Breadcrumb */}
         <div className="fixed top-16 right-0 left-0 lg:left-80 bg-white/80 backdrop-blur-sm border-b border-gray-200 z-30 py-2 px-4 transition-all duration-300">
@@ -138,7 +168,7 @@ const AdminLayout = () => {
             <span className="text-[#502d13] font-medium">{getPageTitle()}</span>
           </div>
         </div>
-        
+
         <AnimatePresence mode="wait">
           <motion.main
             key={location.pathname}
@@ -148,25 +178,17 @@ const AdminLayout = () => {
             transition={{ duration: 0.3 }}
             className="relative p-4 sm:p-6 md:p-8 mt-24"
           >
-            {/* Content Wrapper */}
-            <div className="relative bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-              {/* Decorative Top Bar */}
-              <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#502d13] via-[#7b4a26] to-[#a06e3a]"></div>
-              
-              {/* Pattern Overlay */}
-              <div className="absolute inset-0 opacity-[0.02] pointer-events-none">
-                <div className="w-full h-full" style={{
+            <ErrorBoundary>
+              <div className="relative bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#502d13] via-[#7b4a26] to-[#a06e3a]" />
+                <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{
                   backgroundImage: `repeating-linear-gradient(45deg, #502d13 0px, #502d13 4px, transparent 4px, transparent 12px)`
-                }}></div>
+                }} />
+                <div className="relative p-6">
+                  <Outlet />
+                </div>
               </div>
-
-              {/* Content */}
-              <div className="relative p-6">
-                <Outlet />
-              </div>
-            </div>
-
-            {/* Footer */}
+            </ErrorBoundary>
             <div className="mt-6 text-center text-xs text-gray-400 flex items-center justify-center gap-2">
               <Wrench className="w-3 h-3" />
               <span>Casa Terminal Admin Panel v2.5.0 • Construction Management System</span>

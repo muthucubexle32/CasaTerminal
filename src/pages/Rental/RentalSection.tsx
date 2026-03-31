@@ -10,7 +10,6 @@ import {
   EyeOff,
   AlertCircle,
   Truck,
-
   Calendar,
   Shield,
   CheckCircle,
@@ -18,6 +17,7 @@ import {
 } from 'lucide-react';
 
 const RentalSection = () => {
+  const navigate = useNavigate();
   const [showLogin, setShowLogin] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loginData, setLoginData] = useState({
@@ -25,22 +25,32 @@ const RentalSection = () => {
     password: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: Record<string, string> = {};
 
-    if (!loginData.rentalId) {
-      newErrors.rentalId = 'Rental ID is required';
+    if (!loginData.rentalId.trim()) {
+      newErrors.rentalId = 'Rental ID / Email is required';
     }
-    if (!loginData.password) {
+    if (!loginData.password.trim()) {
       newErrors.password = 'Password is required';
     }
 
     if (Object.keys(newErrors).length === 0) {
-      console.log('Login attempt:', loginData);
-      navigate('/rental/dashboard');
+      setIsLoading(true);
+      // Simulate API call
+      setTimeout(() => {
+        // Set session
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('userType', 'rental');
+        localStorage.setItem('userName', loginData.rentalId.split('@')[0] || loginData.rentalId);
+        localStorage.setItem('userEmail', loginData.rentalId);
+        // Redirect to rental dashboard
+        navigate('/rental/dashboard');
+        setIsLoading(false);
+      }, 500);
     } else {
       setErrors(newErrors);
     }
@@ -152,7 +162,7 @@ const RentalSection = () => {
               >
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Rental ID
+                    Rental ID / Email
                   </label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -166,7 +176,7 @@ const RentalSection = () => {
                       className={`w-full pl-10 pr-4 py-2.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 ${
                         errors.rentalId ? 'border-red-500' : 'border-gray-200'
                       }`}
-                      placeholder="Enter your rental ID"
+                      placeholder="Enter your rental ID or email"
                     />
                   </div>
                   {errors.rentalId && (
@@ -226,6 +236,7 @@ const RentalSection = () => {
                   <button
                     type="button"
                     className="text-sm text-secondary-500 hover:text-primary-600"
+                    onClick={() => alert('Password reset link sent to registered email')}
                   >
                     Forgot Password?
                   </button>
@@ -233,10 +244,20 @@ const RentalSection = () => {
 
                 <button
                   type="submit"
-                  className="w-full bg-secondary-500 text-white py-2.5 rounded-lg font-semibold hover:bg-secondary-600 transition-colors flex items-center justify-center gap-2"
+                  disabled={isLoading}
+                  className="w-full bg-secondary-500 text-white py-2.5 rounded-lg font-semibold hover:bg-secondary-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                 >
-                  <LogIn className="w-4 h-4" />
-                  <span>Login to Dashboard</span>
+                  {isLoading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Logging in...</span>
+                    </>
+                  ) : (
+                    <>
+                      <LogIn className="w-4 h-4" />
+                      <span>Login to Dashboard</span>
+                    </>
+                  )}
                 </button>
               </motion.form>
             )}
