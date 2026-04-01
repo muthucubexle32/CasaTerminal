@@ -226,20 +226,7 @@ const CoreServices = () => {
         </div>
 
         {/* Mobile View All Button */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5, delay: 0.8 }}
-          className="text-center mt-8 md:mt-10 lg:hidden"
-        >
-          <Link
-            to="/services"
-            className="inline-flex items-center gap-2 bg-[#502d13] text-[#e9ddc8] px-6 py-3 rounded-xl font-semibold text-sm hover:bg-[#7b4a26] transition-colors duration-300 shadow-lg"
-          >
-            View All Services
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </motion.div>
+       
       </div>
     </section>
   );

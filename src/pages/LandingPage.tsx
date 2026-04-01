@@ -1,20 +1,30 @@
-import { motion } from 'framer-motion';
-import { HeroSection, ServiceSwipe, CoreServices, WhyChooseUs } from '../components/sections';
+import React from 'react';
+import HeroSection from '../components/sections/HeroSection';
+import CoreServices from '../components/sections/CoreServices';
+import ServiceCarousel from '../components/sections/ServiceSwipe';
+import WhyChooseUs from '../components/sections/WhyChooseUs';
+import LocationPrompt from '../components/LocationPrompt';
+import NearbyProducts from '../components/NearbyProducts';
+import NearbyContractors from '../components/NearbyContractors';
+import NearbyRentals from '../components/NearbyRentals';
 
-const LandingPage = () => {
+const LandingPage: React.FC = () => {
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.5 }}
-    >
+    <>
+      <LocationPrompt />
       <HeroSection />
       <CoreServices />
-      <ServiceSwipe />
+      <ServiceCarousel />
+      
+      {/* Nearby Sections */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <NearbyProducts />
+        <NearbyContractors />
+        <NearbyRentals />
+      </div>
       
       <WhyChooseUs />
-    </motion.div>
+    </>
   );
 };
 
