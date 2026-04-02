@@ -29,10 +29,33 @@ const Navbar = () => {
     ('ontouchstart' in window || navigator.maxTouchPoints > 0)
   ).current;
 
+  // ✅ NEW: Sync authentication state across tabs / window focus
+  useEffect(() => {
+    const syncAuth = () => {
+      const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
+      const type = localStorage.getItem('userType');
+      const name = localStorage.getItem('userName') || '';
+
+      setIsLoggedIn(loggedIn);
+      setUserType(type);
+      setUserName(name);
+    };
+
+    syncAuth(); // initial sync
+
+    window.addEventListener('storage', syncAuth);
+    window.addEventListener('focus', syncAuth);
+
+    return () => {
+      window.removeEventListener('storage', syncAuth);
+      window.removeEventListener('focus', syncAuth);
+    };
+  }, []);
+
+  // Scroll & resize effects (and close menus on scroll)
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
-      // Close mega menu on scroll
       if (activeMegaMenu) setActiveMegaMenu(null);
     };
     const handleResize = () => {
@@ -42,14 +65,6 @@ const Navbar = () => {
         setMobileMenuOpen(null);
       }
     };
-
-    // Check login status
-    const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    const type = localStorage.getItem('userType');
-    const name = localStorage.getItem('userName') || '';
-    setIsLoggedIn(loggedIn);
-    setUserType(type);
-    setUserName(name);
 
     window.addEventListener("scroll", handleScroll);
     window.addEventListener("resize", handleResize);
@@ -414,39 +429,30 @@ const Navbar = () => {
                 </AnimatePresence>
               </div>
 
-              {/* Login/Logout Button */}
+             {/* Login/Logout Button - Redesigned */}
               {isLoggedIn ? (
                 <button
                   onClick={handleLogout}
-                  className="group relative overflow-hidden bg-gradient-to-r from-[#e9ddc8] to-[#f5ede0] text-[#502d13] 
-               px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 md:py-3 rounded-xl 
-               font-semibold text-sm sm:text-base 
-               shadow-md hover:shadow-lg transform hover:scale-[1.02] active:scale-[0.98]
-               transition-all duration-200 ease-out
-               flex items-center gap-2 sm:gap-3 
-               border border-[#d9c8b0] hover:border-[#c9b698]
-               focus:outline-none focus:ring-2 focus:ring-[#502d13]/30"
+                  className="group flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-full 
+                             bg-white/10 backdrop-blur-sm border border-white/20
+                             text-[#e9ddc8] hover:text-white hover:bg-red-500/80 
+                             hover:border-red-400 transition-all duration-200
+                             font-medium text-sm sm:text-base shadow-sm"
                 >
-                  <LogOut className="w-4 h-4 sm:w-5 sm:h-5 rotate-180 transition-transform group-hover:-translate-x-0.5" />
+                  <LogOut className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:-translate-x-0.5" />
                   <span className="hidden sm:inline">Logout</span>
-                  <span className="sm:hidden">Logout</span>
                 </button>
               ) : (
                 <Link
                   to="/login"
                   onClick={() => setIsOpen(false)}
-                  className="group relative overflow-hidden bg-gradient-to-r from-[#e9ddc8] to-[#f5ede0] text-[#502d13] 
-               px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 md:py-3 rounded-xl 
-               font-semibold text-sm sm:text-base 
-               shadow-md hover:shadow-lg transform hover:scale-[1.02] active:scale-[0.98]
-               transition-all duration-200 ease-out
-               flex items-center gap-2 sm:gap-3 
-               border border-[#d9c8b0] hover:border-[#c9b698]
-               focus:outline-none focus:ring-2 focus:ring-[#502d13]/30"
+                  className="group flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2 rounded-full 
+                             bg-[#e9ddc8] text-[#502d13] hover:bg-white hover:shadow-md
+                             border border-[#d4c4a8] transition-all duration-200
+                             font-medium text-sm sm:text-base"
                 >
                   <LogIn className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:translate-x-0.5" />
                   <span className="hidden sm:inline">Login</span>
-                  <span className="sm:hidden">Login</span>
                 </Link>
               )}
 

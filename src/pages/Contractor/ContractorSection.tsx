@@ -44,6 +44,10 @@ const ContractorSection = () => {
       localStorage.setItem('userType', 'contractor');
       localStorage.setItem('userName', loginData.contractorId.split('@')[0] || loginData.contractorId);
       localStorage.setItem('userEmail', loginData.contractorId);
+
+      // 🔥 trigger navbar update
+      window.dispatchEvent(new Event('storage'));
+
       navigate('/contractor/dashboard');
     } else {
       setErrors(newErrors);

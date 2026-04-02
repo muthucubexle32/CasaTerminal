@@ -47,6 +47,10 @@ const RentalSection = () => {
         localStorage.setItem('userType', 'rental');
         localStorage.setItem('userName', loginData.rentalId.split('@')[0] || loginData.rentalId);
         localStorage.setItem('userEmail', loginData.rentalId);
+
+        // 🔥 trigger navbar update
+        window.dispatchEvent(new Event('storage'));
+
         // Redirect to rental dashboard
         navigate('/rental/dashboard');
         setIsLoading(false);

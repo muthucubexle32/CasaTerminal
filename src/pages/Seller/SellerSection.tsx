@@ -43,6 +43,10 @@ const SellerSection = () => {
       localStorage.setItem('userType', 'seller');
       localStorage.setItem('userName', loginData.sellerId.split('@')[0] || loginData.sellerId);
       localStorage.setItem('userEmail', loginData.sellerId);
+
+      // 🔥 trigger navbar update
+      window.dispatchEvent(new Event('storage'));
+
       navigate('/seller/dashboard');
     } else {
       setErrors(newErrors);

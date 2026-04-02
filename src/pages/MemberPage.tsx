@@ -13,7 +13,6 @@ import {
   Clock,
   Users,
   X,
- 
 } from 'lucide-react';
 import SellerSection from './Seller/SellerSection';
 import ContractorSection from './Contractor/ContractorSection';
@@ -23,19 +22,23 @@ import RentalSection from './Rental/RentalSection';
 const MemberPage = (): JSX.Element => {
   const navigate = useNavigate();
 
-  // Redirect logged-in users appropriately
+  // Redirect logic based on authentication and user type
   useEffect(() => {
     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
     const userType = localStorage.getItem('userType');
 
-    if (isLoggedIn && (userType === 'seller' || userType === 'contractor' || userType === 'rental')) {
-      navigate(`/${userType}/dashboard`);
-      return;
-    }
-    if (isLoggedIn && userType === 'customer') {
+    // ❌ Block normal users completely
+    if (userType === 'customer') {
       navigate('/');
       return;
     }
+
+    // ✅ Redirect logged-in business users
+    if (isLoggedIn && ['seller', 'contractor', 'rental'].includes(userType || '')) {
+      navigate(`/${userType}/dashboard`);
+      return;
+    }
+
     window.scrollTo(0, 0);
   }, [navigate]);
 
