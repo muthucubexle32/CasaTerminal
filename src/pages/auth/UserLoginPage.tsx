@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { LogIn, Mail, Lock, Eye, EyeOff, AlertCircle, User, Briefcase, Truck, Shield } from 'lucide-react';
+import { LogIn, Mail, Lock, Eye, EyeOff, AlertCircle, Briefcase, Truck, Shield } from 'lucide-react';
 import logo from "/logo.png";
 
 const UserLoginPage = () => {
@@ -13,27 +13,21 @@ const UserLoginPage = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [userType, setUserType] = useState<'customer' | 'seller' | 'contractor' | 'rental'>('customer');
+  const [userType, setUserType] = useState<'seller' | 'contractor' | 'rental'>('seller');
   const [logoError, setLogoError] = useState(false);
 
-  // Demo credentials
-  const demoCredentials = {
-    customer: { email: 'customer@example.com', password: 'Customer@123', type: 'customer' },
-    seller: { email: 'seller@example.com', password: 'Seller@123', type: 'seller' },
-    contractor: { email: 'contractor@example.com', password: 'Contractor@123', type: 'contractor' },
-    rental: { email: 'rental@example.com', password: 'Rental@123', type: 'rental' }
-  };
+  // Demo credentials removed as requested
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
 
-    // Simulate API call
+    // Simulate API call - replace with actual authentication
     setTimeout(() => {
-      const demoUser = demoCredentials[userType];
-      
-      if (email === demoUser.email && password === demoUser.password) {
+      // In a real app, you would validate credentials against your backend
+      // For now, any non-empty email/password will succeed (since demo removed)
+      if (email && password) {
         // Set user session
         localStorage.setItem('isLoggedIn', 'true');
         localStorage.setItem('userType', userType);
@@ -55,16 +49,10 @@ const UserLoginPage = () => {
             navigate('/member');
         }
       } else {
-        setError('Invalid email or password');
+        setError('Please enter email and password');
         setIsLoading(false);
       }
     }, 1500);
-  };
-
-  const fillDemoCredentials = (type: typeof userType) => {
-    setUserType(type);
-    setEmail(demoCredentials[type].email);
-    setPassword(demoCredentials[type].password);
   };
 
   return (
@@ -91,7 +79,7 @@ const UserLoginPage = () => {
             className="flex justify-center mb-3 sm:mb-4"
           >
             <Link to="/" className="block">
-              <div className="w-16 h-16 sm:w-20 sm:h-20  sm:rounded-3xl flex items-center justify-center shadow-xl hover:shadow-2xl transition-shadow">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 sm:rounded-3xl flex items-center justify-center shadow-xl hover:shadow-2xl transition-shadow">
                 {!logoError ? (
                   <img
                     src={logo}
@@ -116,24 +104,12 @@ const UserLoginPage = () => {
           transition={{ delay: 0.3 }}
           className="bg-[#e9ddc8] rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden"
         >
-          {/* User Type Selector */}
+          {/* User Type Selector - Customer removed */}
           <div className="p-4 sm:p-6 border-b border-[#502d13]/10">
             <label className="block text-xs sm:text-sm font-medium text-[#502d13] mb-2 sm:mb-3">
               Login as
             </label>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <button
-                type="button"
-                onClick={() => setUserType('customer')}
-                className={`p-2 sm:p-3 rounded-lg flex flex-col items-center gap-1 transition-all ${
-                  userType === 'customer'
-                    ? 'bg-[#502d13] text-[#e9ddc8]'
-                    : 'bg-[#502d13]/5 text-[#502d13] hover:bg-[#502d13]/10'
-                }`}
-              >
-                <User className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="text-[10px] sm:text-xs font-medium">Customer</span>
-              </button>
+            <div className="grid grid-cols-3 gap-2">
               <button
                 type="button"
                 onClick={() => setUserType('seller')}
@@ -265,40 +241,9 @@ const UserLoginPage = () => {
               </button>
             </form>
 
-            {/* Demo Credentials */}
-            <div className="mt-4 sm:mt-6">
-              <p className="text-[10px] sm:text-xs text-center text-[#502d13]/50 mb-2 sm:mb-3">
-                Demo Credentials (Click to auto-fill)
-              </p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 sm:gap-2">
-                <button
-                  onClick={() => fillDemoCredentials('customer')}
-                  className="text-[10px] sm:text-xs bg-[#502d13]/5 hover:bg-[#502d13]/10 text-[#502d13] px-1.5 sm:px-2 py-1 sm:py-1.5 rounded transition-colors truncate"
-                >
-                  Customer
-                </button>
-                <button
-                  onClick={() => fillDemoCredentials('seller')}
-                  className="text-[10px] sm:text-xs bg-[#502d13]/5 hover:bg-[#502d13]/10 text-[#502d13] px-1.5 sm:px-2 py-1 sm:py-1.5 rounded transition-colors truncate"
-                >
-                  Seller
-                </button>
-                <button
-                  onClick={() => fillDemoCredentials('contractor')}
-                  className="text-[10px] sm:text-xs bg-[#502d13]/5 hover:bg-[#502d13]/10 text-[#502d13] px-1.5 sm:px-2 py-1 sm:py-1.5 rounded transition-colors truncate"
-                >
-                  Contractor
-                </button>
-                <button
-                  onClick={() => fillDemoCredentials('rental')}
-                  className="text-[10px] sm:text-xs bg-[#502d13]/5 hover:bg-[#502d13]/10 text-[#502d13] px-1.5 sm:px-2 py-1 sm:py-1.5 rounded transition-colors truncate"
-                >
-                  Rental
-                </button>
-              </div>
-            </div>
+            {/* Demo Credentials Section Removed */}
 
-            {/* Sign Up Link - Fixed to navigate to Member page */}
+            {/* Sign Up Link */}
             <div className="mt-4 sm:mt-6 text-center">
               <p className="text-xs sm:text-sm text-[#502d13]/70">
                 Don't have an account?{' '}
