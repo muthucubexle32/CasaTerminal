@@ -1,7 +1,18 @@
 // src/pages/ProductsPage.tsx
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Search, Filter, Star, MapPin, Package } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Search, 
+  Filter, 
+  Star, 
+  MapPin, 
+  Package,
+  ChevronDown,
+  Loader,
+  X
+} from 'lucide-react';
+
+// ==================== TYPES ====================
 
 interface Product {
   id: number;
@@ -15,6 +26,8 @@ interface Product {
   image: string;
   stock: number;
 }
+
+// ==================== MOCK DATA ====================
 
 const mockProducts: Product[] = [
   {
@@ -91,23 +104,236 @@ const mockProducts: Product[] = [
   },
 ];
 
+// List of supported locations (extracted from products)
+const LOCATIONS = [...new Set(mockProducts.map(p => p.location))];
+
+// ==================== CUSTOM HOOKS ====================
+
+// Geolocation hook to detect user's city
+const useGeolocation = () => {
+  const [location, setLocation] = useState<{
+    city: string;
+    loading: boolean;
+    error: string | null;
+  }>({
+    city: '',
+    loading: false,
+    error: null
+  });
+
+  const detectLocation = () => {
+    setLocation(prev => ({ ...prev, loading: true, error: null }));
+
+    if (!navigator.geolocation) {
+      setLocation({
+        city: '',
+        loading: false,
+        error: 'Geolocation is not supported by your browser'
+      });
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        
+        try {
+          // Using OpenStreetMap Nominatim API for reverse geocoding
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10&addressdetails=1`
+          );
+          const data = await response.json();
+          // Extract city/town/village
+          const city = data.address.city || data.address.town || data.address.village || 'Unknown';
+          
+          // Check if the detected city exists in our locations list
+          const matchedLocation = LOCATIONS.find(loc => 
+            loc.toLowerCase() === city.toLowerCase()
+          ) || city; // Fallback to detected city even if not in list
+          
+          setLocation({
+            city: matchedLocation,
+            loading: false,
+            error: null
+          });
+        } catch (error) {
+          setLocation({
+            city: '',
+            loading: false,
+            error: 'Could not detect your city'
+          });
+        }
+      },
+      (error) => {
+        setLocation(prev => ({
+          ...prev,
+          loading: false,
+          error: error.message
+        }));
+      }
+    );
+  };
+
+  return { location, detectLocation };
+};
+
+// ==================== COMPONENTS ====================
+
+// Location Selector Component
+interface LocationSelectorProps {
+  selectedLocation: string;
+  onLocationChange: (location: string) => void;
+  onAutoDetect: () => void;
+  isDetecting: boolean;
+}
+
+const LocationSelector = ({ 
+  selectedLocation, 
+  onLocationChange, 
+  onAutoDetect, 
+  isDetecting 
+}: LocationSelectorProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredLocations = LOCATIONS.filter(loc =>
+    loc.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <div className="relative">
+      <div className="flex items-center gap-2">
+        <div className="flex-1 relative">
+          <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors text-left flex items-center justify-between"
+          >
+            <span className={selectedLocation ? 'text-gray-900' : 'text-gray-500'}>
+              {selectedLocation || 'All Locations'}
+            </span>
+            <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+          </button>
+        </div>
+        
+        <button
+          onClick={onAutoDetect}
+          disabled={isDetecting}
+          className="px-3 py-2 bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors disabled:opacity-50"
+          title="Auto-detect my location"
+        >
+          {isDetecting ? (
+            <Loader className="w-4 h-4 animate-spin text-secondary-500" />
+          ) : (
+            <MapPin className="w-4 h-4 text-secondary-500" />
+          )}
+        </button>
+      </div>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-xl"
+          >
+            <div className="p-2">
+              <div className="relative mb-2">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search locations..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500"
+                />
+              </div>
+
+              <div className="max-h-60 overflow-y-auto">
+                {/* Option to clear location filter */}
+                <button
+                  onClick={() => {
+                    onLocationChange('');
+                    setIsOpen(false);
+                    setSearchTerm('');
+                  }}
+                  className="w-full text-left px-3 py-2 text-sm rounded-lg transition-colors hover:bg-primary-50 text-gray-700"
+                >
+                  All Locations
+                </button>
+                
+                {filteredLocations.length > 0 ? (
+                  filteredLocations.map((loc) => (
+                    <button
+                      key={loc}
+                      onClick={() => {
+                        onLocationChange(loc);
+                        setIsOpen(false);
+                        setSearchTerm('');
+                      }}
+                      className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors ${
+                        selectedLocation === loc
+                          ? 'bg-secondary-500 text-white'
+                          : 'hover:bg-primary-50 text-gray-700'
+                      }`}
+                    >
+                      {loc}
+                    </button>
+                  ))
+                ) : (
+                  <p className="text-center text-gray-500 py-4 text-sm">No locations found</p>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+// ==================== MAIN COMPONENT ====================
+
 const ProductsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState<'price_asc' | 'price_desc' | 'rating_desc'>('rating_desc');
   const [showFilters, setShowFilters] = useState(false);
+  
+  // Location state
+  const [selectedLocation, setSelectedLocation] = useState<string>('');
+  const { location: detectedLocation, detectLocation } = useGeolocation();
+
+  // Auto-set location when detected
+  useEffect(() => {
+    if (detectedLocation.city && !selectedLocation) {
+      setSelectedLocation(detectedLocation.city);
+    }
+  }, [detectedLocation.city, selectedLocation]);
 
   const categories = ['all', ...new Set(mockProducts.map(p => p.category))];
 
+  // Apply all filters (including location)
   const filteredProducts = mockProducts
     .filter(p => selectedCategory === 'all' || p.category === selectedCategory)
-    .filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()) || p.seller.toLowerCase().includes(searchTerm.toLowerCase()))
+    .filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                  p.seller.toLowerCase().includes(searchTerm.toLowerCase()))
+    .filter(p => !selectedLocation || p.location === selectedLocation)
     .sort((a, b) => {
       if (sortBy === 'price_asc') return a.price - b.price;
       if (sortBy === 'price_desc') return b.price - a.price;
       if (sortBy === 'rating_desc') return b.rating - a.rating;
       return 0;
     });
+
+  // Clear all filters including location
+  const handleClearAllFilters = () => {
+    setSelectedCategory('all');
+    setSearchTerm('');
+    setSelectedLocation('');
+    setSortBy('rating_desc');
+  };
 
   return (
     <div className="min-h-screen bg-primary-50 py-8">
@@ -120,6 +346,19 @@ const ProductsPage = () => {
           <h1 className="text-3xl md:text-4xl font-bold text-secondary-500 mb-2">Construction Materials</h1>
           <p className="text-gray-600">Find the best quality construction materials at competitive prices</p>
         </motion.div>
+
+        {/* Location Selector - Prominent placement */}
+        <div className="mb-6 max-w-md mx-auto">
+          <LocationSelector
+            selectedLocation={selectedLocation}
+            onLocationChange={setSelectedLocation}
+            onAutoDetect={detectLocation}
+            isDetecting={detectedLocation.loading}
+          />
+          {detectedLocation.error && (
+            <p className="text-xs text-red-500 mt-1 text-center">{detectedLocation.error}</p>
+          )}
+        </div>
 
         {/* Search and Filters */}
         <div className="flex flex-col sm:flex-row gap-4 mb-8">
@@ -172,28 +411,54 @@ const ProductsPage = () => {
                   ))}
                 </select>
               </div>
-              {/* Add more filters if needed */}
               <div className="flex items-end">
                 <button
-                  onClick={() => {
-                    setSelectedCategory('all');
-                    setSearchTerm('');
-                  }}
-                  className="px-4 py-2 text-sm text-gray-600 hover:text-secondary-500"
+                  onClick={handleClearAllFilters}
+                  className="px-4 py-2 text-sm text-gray-600 hover:text-secondary-500 flex items-center gap-1"
                 >
-                  Clear Filters
+                  <X className="w-4 h-4" />
+                  Clear All Filters
                 </button>
               </div>
             </div>
           </motion.div>
         )}
 
+        {/* Results Summary */}
+        <div className="flex justify-between items-center mb-4 text-sm text-gray-600">
+          <p>
+            Showing <span className="font-semibold text-secondary-500">{filteredProducts.length}</span> products
+            {selectedLocation && <span> in <span className="font-medium">{selectedLocation}</span></span>}
+          </p>
+          {selectedLocation && (
+            <button
+              onClick={() => setSelectedLocation('')}
+              className="text-secondary-500 hover:text-secondary-600 flex items-center gap-1"
+            >
+              <X className="w-3 h-3" />
+              Clear location
+            </button>
+          )}
+        </div>
+
         {/* Products Grid */}
         {filteredProducts.length === 0 ? (
           <div className="text-center py-12">
             <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900">No products found</h3>
-            <p className="text-gray-500 mt-1">Try adjusting your search or filters</p>
+            <p className="text-gray-500 mt-1">
+              {selectedLocation 
+                ? `No products available in ${selectedLocation}. Try a different location.`
+                : 'Try adjusting your search or filters'}
+            </p>
+            {(selectedLocation || searchTerm || selectedCategory !== 'all') && (
+              <button
+                onClick={handleClearAllFilters}
+                className="mt-4 px-4 py-2 bg-secondary-500 text-white rounded-lg hover:bg-secondary-600 transition-colors"
+              >
+                Clear all filters
+              </button>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

@@ -3,10 +3,10 @@ import { motion } from 'framer-motion';
 import {
   MapPin, Phone, Mail, MessageCircle,
   Facebook, Twitter, Instagram, Linkedin,
-  ArrowUp, ChevronRight, Clock, Award,
+  ChevronRight, Clock, Award,
   Shield, Truck
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import logo from "/logo.png";
 
 // Try to import logo with fallback
@@ -33,17 +33,12 @@ interface ContactInfoItem {
 
 
 const Footer = () => {
-  const [showScrollTop, setShowScrollTop] = useState(false);
+  
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [logoError, setLogoError] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => setShowScrollTop(window.scrollY > 500);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+
   const toggleSection = (section: string) => setExpandedSection(expandedSection === section ? null : section);
 
   const footerSections: Record<string, FooterSection> = {
@@ -556,16 +551,7 @@ const Footer = () => {
       </div>
 
       {/* Scroll to Top Button */}
-      <motion.button
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: showScrollTop ? 1 : 0, opacity: showScrollTop ? 1 : 0 }}
-        transition={{ duration: 0.2 }}
-        onClick={scrollToTop}
-        className="fixed bottom-20 md:bottom-8 right-4 z-50 bg-gradient-to-r from-[#e9ddc8] to-[#d4b68a] text-[#502d13] p-2.5 sm:p-3 md:p-4 rounded-full shadow-2xl hover:shadow-[#e9ddc8]/30 transition-all duration-300 group"
-        aria-label="Scroll to top"
-      >
-        <ArrowUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 group-hover:-translate-y-1 transition-transform" />
-      </motion.button>
+     
 
 
 
